@@ -46,6 +46,7 @@ int *CoresDosPoligonos;
 
 // Limites logicos da area de desenho
 Ponto Min, Max, PontoClicado;
+Ponto p1;
 
 bool desenha = false;
 bool FoiClicado = false;
@@ -125,6 +126,8 @@ void init()
 
     Min = Min - Largura * 0.1;
     Max = Max + Largura * 0.1;
+
+    p1 = Ponto(1,1);
 }
 
 double nFrames = 0;
@@ -173,6 +176,16 @@ void reshape(int w, int h)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+}
+// **********************************************************************
+//
+// **********************************************************************
+void desenhaTriangulo() {
+    glBegin(GL_TRIANGLES);
+        glVertex2f(p1.x,p1.y);
+        glVertex2f(p1.x+1,p1.y);
+        glVertex2f(p1.x+0.5,p1.y+1);
+    glEnd();
 }
 // **********************************************************************
 //
@@ -272,6 +285,8 @@ void display(void)
     // glColor3f(1,0,0); // R, G, B  [0..1]
     // DesenhaLinha(Mapa.getVertice(0), Ponto(Min.x, Max.y));
 
+    desenhaTriangulo();
+
     glutSwapBuffers();
 }
 // **********************************************************************
@@ -311,6 +326,18 @@ void keyboard(unsigned char key, int x, int y)
         break;
     case ' ':
         desenha = !desenha;
+        break;
+    case 'w':
+        p1.y += 0.1;
+        break;
+    case 'a':
+        p1.x -= 0.1;
+        break;
+    case 's':
+        p1.y -= 0.1;
+        break;
+    case 'd':
+        p1.x += 0.1;
         break;
     default:
         break;
