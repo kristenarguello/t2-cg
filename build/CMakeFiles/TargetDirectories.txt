@@ -1,3 +1,3 @@
-/home/ramiro/cs/4_sem/comp_graf/voronoi/build/CMakeFiles/main.dir
-/home/ramiro/cs/4_sem/comp_graf/voronoi/build/CMakeFiles/edit_cache.dir
-/home/ramiro/cs/4_sem/comp_graf/voronoi/build/CMakeFiles/rebuild_cache.dir
+/Users/kristen/Downloads/facul/4semestre/comp-grafica/t1/voronoi-t1/build/CMakeFiles/main.dir
+/Users/kristen/Downloads/facul/4semestre/comp-grafica/t1/voronoi-t1/build/CMakeFiles/edit_cache.dir
+/Users/kristen/Downloads/facul/4semestre/comp-grafica/t1/voronoi-t1/build/CMakeFiles/rebuild_cache.dir

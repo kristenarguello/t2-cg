@@ -25,6 +25,10 @@ using namespace std;
 #include <GL/glut.h>
 #endif
 
+#ifdef __APPLE__
+#include <glut.h>
+#endif
+
 #include "Ponto.h"
 #include "Poligono.h"
 

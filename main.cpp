@@ -1,6 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef __APPLE__
+#include <glut.h>
+#endif
+
+#ifdef __linux__
 #include <GL/glut.h>
+#endif
 
 #include <point.hpp>
 

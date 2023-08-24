@@ -20,7 +20,13 @@
 
 using namespace std;
 
+#ifdef __APPLE__
+#include <glut.h>
+#endif
+
+#ifdef __linux__
 #include <GL/glut.h>
+#endif
 
 #include "Ponto.h"
 #include "Poligono.h"
