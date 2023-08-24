@@ -1,5 +1,12 @@
 # codigo base 🪑 computacao grafica 
 
+## generate build
+```
+cd ./build
+cdmake ..
+```
+
+
 ## compile
 ``` 
 cmake --build ./build
