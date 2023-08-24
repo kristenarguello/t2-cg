@@ -1,0 +1,3 @@
+/home/ramiro/cs/4_sem/comp_graf/voronoi/build/CMakeFiles/main.dir
+/home/ramiro/cs/4_sem/comp_graf/voronoi/build/CMakeFiles/edit_cache.dir
+/home/ramiro/cs/4_sem/comp_graf/voronoi/build/CMakeFiles/rebuild_cache.dir
