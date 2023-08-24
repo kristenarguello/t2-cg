@@ -3,7 +3,7 @@
 ## generate build
 ```
 cd ./build
-cdmake ..
+cmake ..
 ```
 
 
