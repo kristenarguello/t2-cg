@@ -35,6 +35,7 @@ using namespace std;
 #include "ListaDeCoresRGB.h"
 
 #include "Temporizador.h"
+#include "Envelope.h"
 
 Temporizador T;
 double AccumDeltaT = 0;
@@ -111,6 +112,8 @@ void init()
 
     Voro.LePoligonos("ListaDePoligonos-V2.txt");
     Voro.obtemLimites(Min, Max);
+    // aqui o metodo dos vizinhos
+    //Voro.obtemVizinhosDasArestas();
     Min.imprime("Minimo:", "\n");
     Max.imprime("Maximo:", "\n");
 
@@ -275,16 +278,16 @@ void display(void)
         Ponto Esq;
         Ponto Dir(-1, 0);
         Esq = PontoClicado + Dir * (1000);
-        glColor3f(0, 1, 0); // R, G, B  [0..1]
+        // glColor3f(0, 1, 0); // R, G, B  [0..1]
         DesenhaLinha(PontoClicado, Esq);
 
-        glColor3f(1, 0, 0); // R, G, B  [0..1]
     }
 
     // Mapa.desenhaVertices();
     // glColor3f(1,0,0); // R, G, B  [0..1]
     // DesenhaLinha(Mapa.getVertice(0), Ponto(Min.x, Max.y));
 
+    glColor3f(1, 0, 0); // R, G, B  [0..1]
     desenhaTriangulo();
 
     glutSwapBuffers();
