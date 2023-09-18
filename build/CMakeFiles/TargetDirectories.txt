@@ -1,3 +1,0 @@
-/Users/kristen/Downloads/facul/4semestre/comp-grafica/t1/voronoi-t1/build/CMakeFiles/main.dir
-/Users/kristen/Downloads/facul/4semestre/comp-grafica/t1/voronoi-t1/build/CMakeFiles/edit_cache.dir
-/Users/kristen/Downloads/facul/4semestre/comp-grafica/t1/voronoi-t1/build/CMakeFiles/rebuild_cache.dir
