@@ -12,7 +12,6 @@
 #include <iostream>
 using namespace std;
 
-
 #ifdef WIN32
 #include <windows.h>
 #include <glut.h>
@@ -23,7 +22,7 @@ using namespace std;
 #endif
 
 #ifdef __linux__
-#include <glut.h>
+#include <GL/glut.h>
 #endif
 
 #include "Ponto.h"
@@ -31,18 +30,18 @@ using namespace std;
 class Envelope
 {
     Ponto Meio, MeiaLargura;
+
 public:
-    Ponto Min,Max; // envelope
-    
+    Ponto Min, Max; // envelope
+
     Envelope();
     Envelope(Ponto P1, Ponto P2);
     bool temColisao(Envelope E);
-    void GeraEnvelope(Ponto P1, Ponto P2); // 
+    void GeraEnvelope(Ponto P1, Ponto P2); //
     void AtualizaEnvelope();
     bool pontoEstaDentro(Ponto P);
     void imprime();
     void Desenha();
-    
 };
 
 #endif /* Envelope_hpp */
