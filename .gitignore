@@ -4,7 +4,8 @@
 ### C++ ###
 # Prerequisites
 *.d
-
+Makefile
+main
 # Compiled Object files
 *.slo
 *.lo
