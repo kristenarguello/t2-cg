@@ -200,13 +200,18 @@ void DesenhaPiso()
         glPushMatrix();
         for (int z = -20; z < 20; z++)
         {
-            DesenhaLadrilho(MediumGoldenrod, rand() % 40);
+            DesenhaLadrilho(DarkSlateBlue, SteelBlue);
             glTranslated(0, 0, 1);
         }
         glPopMatrix();
         glTranslated(1, 0, 0);
     }
     glPopMatrix();
+}
+
+void DesenhaMuro()
+{
+    // TODO: DesenhaMuro
 }
 // **********************************************************************
 //  void DefineLuz(void)
@@ -283,8 +288,8 @@ void PosicUser()
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(0, 0, 10, // Posi��o do Observador
-              0, 0, 0,  // Posi��o do Alvo
+    gluLookAt(0, 30, 10, // Posi��o do Observador
+              0, 0, 0,   // Posi��o do Alvo
               0.0f, 1.0f, 0.0f);
 }
 // **********************************************************************
@@ -342,6 +347,8 @@ void display(void)
     // DesenhaCubo(1);
     glPopMatrix();
 
+    DesenhaPiso();
+    glRotated(90, 1, 0, 0);
     DesenhaPiso();
 
     glutSwapBuffers();
