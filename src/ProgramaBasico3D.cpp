@@ -51,7 +51,19 @@ int ModoDeExibicao = 1;
 
 double nFrames = 0;
 double TempoTotal = 0;
-Ponto CantoEsquerdo = {-20, -1, -10};
+Ponto CantoEsquerdo = Ponto(-20, -1, -10);
+bool borda = true;
+// int variaX = -7;
+// int variaY = 5;
+// int variaZ = 45;
+float variaX = -7.0f;
+float variaY = 0;
+float variaZ = 30.0f;
+// -7.0f, 0, 30.0f
+float variaPosX = -4.0f;
+
+float cannonAngle = 0;
+float cannonBodyAngle = 0;
 // **********************************************************************
 //  void init(void)
 //        Inicializa os parametros globais de OpenGL
@@ -146,13 +158,30 @@ void DesenhaCubo(float tamAresta)
     glVertex3f(-tamAresta / 2, tamAresta / 2, -tamAresta / 2);
     glEnd();
 }
-void DesenhaParalelepipedo()
+void DesenhaParalelepipedo(float x, float y, float z, float scaleX, float sca)
 {
     glPushMatrix();
-    glTranslatef(0, 0, -1);
+    glTranslatef(x, y, z);
     glScalef(1, 1, 2);
-    glutSolidCube(2);
-    // DesenhaCubo(1);
+    glutSolidCube(1);
+    glPopMatrix();
+}
+
+
+void DesenhaCanhao(float x, float y, float z, float cannonAngle, float cannonBodyAngle) {
+    glPushMatrix();
+    glRotatef(cannonBodyAngle, 0, 1, 0);
+        glTranslatef(x, y, z);
+        glScalef(2, 1, 3);
+        glutSolidCube(1);
+    glPopMatrix();
+
+    glPushMatrix();
+    glRotatef(cannonBodyAngle, 0, 1, 0);
+        glTranslatef(x, y, z - 2);
+        glScalef(0.5f, 0.5f, 1);
+        glRotatef(cannonAngle, 1, 0, 0);
+        glutSolidCube(1);
     glPopMatrix();
 }
 
@@ -162,7 +191,7 @@ void DesenhaParalelepipedo()
 // Eh possivel definir a cor da borda e do interior do piso
 // O ladrilho tem largula 1, centro no (0,0,0) e est� sobre o plano XZ
 // **********************************************************************
-void DesenhaLadrilho(int corBorda, int corDentro)
+void DesenhaLadrilho(int corBorda, int corDentro, bool borda)
 {
     defineCor(corDentro); // desenha QUAD preenchido
     // glColor3f(1, 1, 1);
@@ -173,8 +202,10 @@ void DesenhaLadrilho(int corBorda, int corDentro)
     glVertex3f(0.5f, 0.0f, 0.5f);
     glVertex3f(0.5f, 0.0f, -0.5f);
     glEnd();
-
-    defineCor(corBorda);
+    
+    if (borda) {
+        defineCor(corBorda);
+    }
     // glColor3f(0, 1, 0);
 
     glBegin(GL_LINE_STRIP);
@@ -195,12 +226,12 @@ void DesenhaPiso()
     srand(100); // usa uma semente fixa para gerar sempre as mesma cores no piso
     glPushMatrix();
     glTranslated(CantoEsquerdo.x, CantoEsquerdo.y, CantoEsquerdo.z);
-    for (int x = -20; x < 20; x++)
+    for (int x = 0; x < 25; x++)
     {
         glPushMatrix();
-        for (int z = -20; z < 20; z++)
+        for (int z = 0; z < 50; z++)
         {
-            DesenhaLadrilho(DarkSlateBlue, SteelBlue);
+            DesenhaLadrilho(DarkSlateBlue, SteelBlue, borda);
             glTranslated(0, 0, 1);
         }
         glPopMatrix();
@@ -211,8 +242,26 @@ void DesenhaPiso()
 
 void DesenhaMuro()
 {
-    // TODO: DesenhaMuro
+    
+    glRotated(90, 1, 0, 0);
+    srand(100); // usa uma semente fixa para gerar sempre as mesma cores no piso
+    glPushMatrix();
+    glTranslated(CantoEsquerdo.x, CantoEsquerdo.y, CantoEsquerdo.z);
+    for (int x = 0; x < 25; x++)
+    {
+        glPushMatrix();
+        for (int y = 0; y < 15; y++)
+        {
+            DesenhaLadrilho(DarkSlateBlue, SteelBlue, borda);
+            glTranslated(0, 0, 1);
+        }
+        glPopMatrix();
+        glTranslated(1, 0, 0);
+    }
+    glPopMatrix();
+
 }
+
 // **********************************************************************
 //  void DefineLuz(void)
 // **********************************************************************
@@ -288,8 +337,8 @@ void PosicUser()
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(0, 30, 10, // Posi��o do Observador
-              0, 0, 0,   // Posi��o do Alvo
+    gluLookAt(-7, 5, 45, // Posi��o do Observador
+              -7, 0, 0,   // Posi��o do Alvo
               0.0f, 1.0f, 0.0f);
 }
 // **********************************************************************
@@ -340,16 +389,24 @@ void display(void)
     glPopMatrix();
 
     glPushMatrix();
-    glTranslatef(-4.0f, 0.0f, 2.0f);
+    glTranslatef(variaPosX, 0.0f, 2.0f);
     glRotatef(angulo, 0, 1, 0);
     glColor3f(0.6156862745, 0.8980392157, 0.9803921569); // Azul claro
     glutSolidCube(2);
     // DesenhaCubo(1);
     glPopMatrix();
 
-    DesenhaPiso();
-    glRotated(90, 1, 0, 0);
-    DesenhaPiso();
+    glPushMatrix();
+        DesenhaPiso();
+        glTranslatef(0, 3.5f, 15.5f);
+        DesenhaMuro();
+    glPopMatrix();
+
+    // glRotated(180, 0, 1, 0);
+    DesenhaCanhao(variaX, variaY, variaZ, cannonAngle, cannonBodyAngle);
+
+    // DesenhaCanhao(-7.0f, 0, 30.0f, cannonAngle);
+
 
     glutSwapBuffers();
 }
@@ -375,6 +432,30 @@ void keyboard(unsigned char key, int x, int y)
         init();
         glutPostRedisplay();
         break;
+    case 'b':
+        borda = !borda;
+        break;
+    case 'd':
+        variaX+=0.25;
+        break;
+    case 'a':
+        variaX-=0.25;
+        break;
+    case 'w':
+        // variaY++;
+        if (variaZ > 25) {
+            variaZ-=0.25f;   
+        }
+        break;
+    case 's':
+        // variaY--;
+        if (variaZ < 40) {
+            variaZ+=0.25f;
+        }
+        break;
+    case 'q':
+        variaPosX++;
+        break;
     default:
         cout << key;
         break;
@@ -391,10 +472,23 @@ void arrow_keys(int a_keys, int x, int y)
     switch (a_keys)
     {
     case GLUT_KEY_UP:     // When Up Arrow Is Pressed...
-        glutFullScreen(); // Go Into Full Screen Mode
+        // glutFullScreen(); // Go Into Full Screen Mode
+        if (cannonAngle < 45) 
+            cannonAngle+=3;  
+        
         break;
     case GLUT_KEY_DOWN: // When Down Arrow Is Pressed...
-        glutInitWindowSize(700, 500);
+        // glutInitWindowSize(700, 500);
+        // if (cannonAngle >  )
+        // printf("%f\n", cannonAngle);
+        if (cannonAngle > -10) 
+            cannonAngle-=3;
+        break;  
+    case GLUT_KEY_LEFT:
+        cannonBodyAngle-=3;
+        break;  
+    case GLUT_KEY_RIGHT:
+        cannonBodyAngle+=3;
         break;
     default:
         break;
