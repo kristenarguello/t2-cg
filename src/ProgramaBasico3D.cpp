@@ -164,8 +164,8 @@ void DesenhaParalelepipedo()
 // **********************************************************************
 void DesenhaLadrilho(int corBorda, int corDentro)
 {
-    // defineCor(corDentro);// desenha QUAD preenchido
-    glColor3f(1, 1, 1);
+    defineCor(corDentro); // desenha QUAD preenchido
+    // glColor3f(1, 1, 1);
     glBegin(GL_QUADS);
     glNormal3f(0, 1, 0);
     glVertex3f(-0.5f, 0.0f, -0.5f);
@@ -174,8 +174,8 @@ void DesenhaLadrilho(int corBorda, int corDentro)
     glVertex3f(0.5f, 0.0f, -0.5f);
     glEnd();
 
-    // defineCor(corBorda);
-    glColor3f(0, 1, 0);
+    defineCor(corBorda);
+    // glColor3f(0, 1, 0);
 
     glBegin(GL_LINE_STRIP);
     glNormal3f(0, 1, 0);
