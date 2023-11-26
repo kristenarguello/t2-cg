@@ -29,6 +29,8 @@ using namespace std;
 #include <GL/glut.h>
 #endif
 
+#include "../include/LeitorObjeto3D.h"
+
 #include "Temporizador.h"
 #include "ListaDeCoresRGB.h"
 #include "Ponto.h"
@@ -52,18 +54,24 @@ int ModoDeExibicao = 1;
 double nFrames = 0;
 double TempoTotal = 0;
 Ponto CantoEsquerdo = Ponto(-20, -1, -10);
-bool borda = true;
-// int variaX = -7;
-// int variaY = 5;
-// int variaZ = 45;
-float variaX = -7.0f;
-float variaY = 0;
-float variaZ = 30.0f;
-// -7.0f, 0, 30.0f
+bool borda = false;
+
 float variaPosX = -4.0f;
 
 float cannonAngle = 0;
 float cannonBodyAngle = 0;
+Ponto posCannon = Ponto(-7.0f, 0, 35.0f);
+
+
+#define inimigos 20
+Objeto3D dog;
+struct Dog {
+    float x, y, z;
+    bool inimigo, vivo;
+};
+Dog* dogsList;
+// Ponto miniCannon = Ponto(posCannon.x + 5, posCannon.y - 2, posCannon.z + 2);
+
 // **********************************************************************
 //  void init(void)
 //        Inicializa os parametros globais de OpenGL
@@ -85,6 +93,20 @@ void init(void)
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     else
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    dog = Objeto3D();
+    dog.LeObjeto("../build/dog.tri");
+    dogsList = new Dog[inimigos];
+    for (int i=0; i<inimigos; i++) {
+        Dog& d = dogsList[i];
+        d.x = (posCannon.x - 10) + (rand() % 20);
+        // d.x = posCannon.x;
+        d.y = posCannon.y;
+        d.z = posCannon.z - 43.5 + (rand() % 22);
+        // d.z = posCannon.z;
+        d.inimigo = i%2==0;
+        d.vivo = true;
+    }
 }
 
 // **********************************************************************
@@ -168,19 +190,21 @@ void DesenhaParalelepipedo(float x, float y, float z, float scaleX, float sca)
 }
 
 
-void DesenhaCanhao(float x, float y, float z, float cannonAngle, float cannonBodyAngle) {
+void DesenhaCanhao(float cannonAngle, float cannonBodyAngle) {
     glPushMatrix();
-    glRotatef(cannonBodyAngle, 0, 1, 0);
-        glTranslatef(x, y, z);
+        glColor3f(1,1,1);
+
+        glTranslatef(posCannon.x, posCannon.y, posCannon.z);
+        glRotatef(cannonBodyAngle, 0, 1, 0);
         glScalef(2, 1, 3);
         glutSolidCube(1);
-    glPopMatrix();
 
-    glPushMatrix();
-    glRotatef(cannonBodyAngle, 0, 1, 0);
-        glTranslatef(x, y, z - 2);
-        glScalef(0.5f, 0.5f, 1);
+    
+        // printf("%f\n", miniCannon.x);
+        glColor3f(0, 0.25f, 0.65f);
+        glTranslatef(0, 0.5, -0.4);
         glRotatef(cannonAngle, 1, 0, 0);
+        glScalef(0.3f, 0.3f, 0.7f);
         glutSolidCube(1);
     glPopMatrix();
 }
@@ -321,7 +345,6 @@ void MygluPerspective(float fieldOfView, float aspect, float zNear, float zFar)
 // **********************************************************************
 void PosicUser()
 {
-
     // Define os par�metros da proje��o Perspectiva
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -340,6 +363,10 @@ void PosicUser()
     gluLookAt(-7, 5, 45, // Posi��o do Observador
               -7, 0, 0,   // Posi��o do Alvo
               0.0f, 1.0f, 0.0f);
+
+    // gluLookAt(-12, 30 , 15 , -7,0,0, 0,1,0);
+
+// Ponto CantoEsquerdo = Ponto(-20, -1, -10);
 }
 // **********************************************************************
 //  void reshape( int w, int h )
@@ -380,21 +407,21 @@ void display(void)
 
     glMatrixMode(GL_MODELVIEW);
 
-    glPushMatrix();
-    glTranslatef(5.0f, 0.0f, 3.0f);
-    glRotatef(angulo, 0, 1, 0);
-    glColor3f(0.5f, 0.0f, 0.0f); // Vermelho
-    glutSolidCube(2);
-    // DesenhaCubo(1);
-    glPopMatrix();
+    // glPushMatrix();
+    // glTranslatef(5.0f, 0.0f, 3.0f);
+    // glRotatef(angulo, 0, 1, 0);
+    // glColor3f(0.5f, 0.0f, 0.0f); // Vermelho
+    // glutSolidCube(2);
+    // // DesenhaCubo(1);
+    // glPopMatrix();
 
-    glPushMatrix();
-    glTranslatef(variaPosX, 0.0f, 2.0f);
-    glRotatef(angulo, 0, 1, 0);
-    glColor3f(0.6156862745, 0.8980392157, 0.9803921569); // Azul claro
-    glutSolidCube(2);
-    // DesenhaCubo(1);
-    glPopMatrix();
+    // glPushMatrix();
+    // glTranslatef(variaPosX, 0.0f, 2.0f);
+    // glRotatef(angulo, 0, 1, 0);
+    // glColor3f(0.6156862745, 0.8980392157, 0.9803921569); // Azul claro
+    // glutSolidCube(2);
+    // // DesenhaCubo(1);
+    // glPopMatrix();
 
     glPushMatrix();
         DesenhaPiso();
@@ -403,10 +430,41 @@ void display(void)
     glPopMatrix();
 
     // glRotated(180, 0, 1, 0);
-    DesenhaCanhao(variaX, variaY, variaZ, cannonAngle, cannonBodyAngle);
+    DesenhaCanhao(cannonAngle, cannonBodyAngle);
 
     // DesenhaCanhao(-7.0f, 0, 30.0f, cannonAngle);
 
+    for (int i=0; i<inimigos; i++) {
+        Dog& d = dogsList[i];
+        printf("Dog(%.2f, %.2f, %.2f)\n", d.x, d.y, d.z);
+        glPushMatrix();
+            glTranslatef(d.x, d.y, d.z);
+            glRotatef(-90, 0, 1, 0);
+            glScalef(0.2,0.2,0.2);
+            if (d.inimigo) glColor3f(1.0f,0.0f,0.0f); //mudar, mto parecido com o deles
+            else           glColor3f(0.0f, 1.0f, 0.0f);
+
+            dog.ExibeObjeto();
+        glPopMatrix();
+    }
+    
+
+    // // exibir as vacas
+    // for (int i=0; i<N_AMIGOS_INIMIGOS; i++)
+    // {
+    //     Vaca& v = vacas[i];
+    //     //printf("Vaca(%.2f, %.2f, %.2f)\n", v.posX, v.posY, v.posZ);
+    //     glPushMatrix();
+    //         glTranslatef(v.posX, v.posY, v.posZ);
+    //         glRotatef(-100, 1, 0, 0);
+    //         glRotatef(60, 0, 0, 1);
+    //         //glScalef(0.05, 0.05, 0.05);
+    //         glScalef(0.07, 0.07, 0.07);
+    //         if (v.inimigo) glColor3f(1.0f,0.0f,0.0f);
+    //         else           glColor3f(0.0f, 0.0f, 1.0f);
+    //         vacaModel.ExibeObjeto();
+    //     glPopMatrix();
+    // }
 
     glutSwapBuffers();
 }
@@ -436,25 +494,32 @@ void keyboard(unsigned char key, int x, int y)
         borda = !borda;
         break;
     case 'd':
-        variaX+=0.25;
+        printf("\n%f",posCannon.x);
+        if (posCannon.x < 2.75f)
+            posCannon.x+=0.25;
         break;
     case 'a':
-        variaX-=0.25;
+        printf("\n%f",posCannon.x);
+        if (posCannon.x > -18.50f)
+            posCannon.x-=0.25;
         break;
     case 'w':
         // variaY++;
-        if (variaZ > 25) {
-            variaZ-=0.25f;   
-        }
+        // printf("\n%f",posCannon.z);
+        if (posCannon.z > 25)
+            posCannon.z-=0.25f;
         break;
     case 's':
         // variaY--;
-        if (variaZ < 40) {
-            variaZ+=0.25f;
-        }
+        // printf("\n%f",posCannon.z);
+        if (posCannon.z < 38.5f) 
+            posCannon.z+=0.25f;
         break;
     case 'q':
         variaPosX++;
+        break;
+    case ' ':
+        printf("TIRO\n");
         break;
     default:
         cout << key;
@@ -484,12 +549,14 @@ void arrow_keys(int a_keys, int x, int y)
         if (cannonAngle > -10) 
             cannonAngle-=3;
         break;  
-    case GLUT_KEY_LEFT:
-        cannonBodyAngle-=3;
-        break;  
     case GLUT_KEY_RIGHT:
-        cannonBodyAngle+=3;
+        if (cannonBodyAngle-3 > -45.0) 
+            cannonBodyAngle-=3;
         break;
+    case GLUT_KEY_LEFT:
+        if (cannonBodyAngle+3 < 45.0) 
+            cannonBodyAngle+=3;
+        break;  
     default:
         break;
     }
