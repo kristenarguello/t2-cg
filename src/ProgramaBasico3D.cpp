@@ -62,14 +62,14 @@ float cannonAngle = 0;
 float cannonBodyAngle = 0;
 Ponto posCannon = Ponto(-7.0f, 0, 35.0f);
 
-
 #define inimigos 20
 Objeto3D dog;
-struct Dog {
+struct Dog
+{
     float x, y, z;
     bool inimigo, vivo;
 };
-Dog* dogsList;
+Dog *dogsList;
 // Ponto miniCannon = Ponto(posCannon.x + 5, posCannon.y - 2, posCannon.z + 2);
 
 // **********************************************************************
@@ -95,16 +95,18 @@ void init(void)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     dog = Objeto3D();
-    dog.LeObjeto("../build/dog.tri");
+    char path[] = "../build/dog.tri";
+    dog.LeObjeto(path);
     dogsList = new Dog[inimigos];
-    for (int i=0; i<inimigos; i++) {
-        Dog& d = dogsList[i];
+    for (int i = 0; i < inimigos; i++)
+    {
+        Dog &d = dogsList[i];
         d.x = (posCannon.x - 10) + (rand() % 20);
         // d.x = posCannon.x;
         d.y = posCannon.y;
         d.z = posCannon.z - 43.5 + (rand() % 22);
         // d.z = posCannon.z;
-        d.inimigo = i%2==0;
+        d.inimigo = i % 2 == 0;
         d.vivo = true;
     }
 }
@@ -189,30 +191,31 @@ void DesenhaParalelepipedo(float x, float y, float z, float scaleX, float sca)
     glPopMatrix();
 }
 
-void DesenhaTiro(Ponto p) {
+void DesenhaTiro(Ponto p)
+{
     glPushMatrix();
-        glColor3f(0,0,0);
-        glTranslatef(p.x, p.y, p.z);
-        glutSolidSphere(1, 50, 50);
-    glPopMatrix();   
+    glColor3f(0, 0, 0);
+    glTranslatef(p.x, p.y, p.z);
+    glutSolidSphere(1, 50, 50);
+    glPopMatrix();
 }
 
-void DesenhaCanhao(float cannonAngle, float cannonBodyAngle) {
+void DesenhaCanhao(float cannonAngle, float cannonBodyAngle)
+{
     glPushMatrix();
-        glColor3f(1,1,1);
+    glColor3f(1, 1, 1);
 
-        glTranslatef(posCannon.x, posCannon.y, posCannon.z);
-        glRotatef(cannonBodyAngle, 0, 1, 0);
-        glScalef(2, 1, 3);
-        glutSolidCube(1);
+    glTranslatef(posCannon.x, posCannon.y, posCannon.z);
+    glRotatef(cannonBodyAngle, 0, 1, 0);
+    glScalef(2, 1, 3);
+    glutSolidCube(1);
 
-    
-        // printf("%f\n", miniCannon.x);
-        glColor3f(0, 0.25f, 0.65f);
-        glTranslatef(0, 0.5, -0.4);
-        glRotatef(cannonAngle, 1, 0, 0);
-        glScalef(0.3f, 0.3f, 0.7f);
-        glutSolidCube(1);
+    // printf("%f\n", miniCannon.x);
+    glColor3f(0, 0.25f, 0.65f);
+    glTranslatef(0, 0.5, -0.4);
+    glRotatef(cannonAngle, 1, 0, 0);
+    glScalef(0.3f, 0.3f, 0.7f);
+    glutSolidCube(1);
     glPopMatrix();
 }
 
@@ -233,8 +236,9 @@ void DesenhaLadrilho(int corBorda, int corDentro, bool borda)
     glVertex3f(0.5f, 0.0f, 0.5f);
     glVertex3f(0.5f, 0.0f, -0.5f);
     glEnd();
-    
-    if (borda) {
+
+    if (borda)
+    {
         defineCor(corBorda);
     }
     // glColor3f(0, 1, 0);
@@ -273,7 +277,7 @@ void DesenhaPiso()
 
 void DesenhaMuro()
 {
-    
+
     glRotated(90, 1, 0, 0);
     srand(100); // usa uma semente fixa para gerar sempre as mesma cores no piso
     glPushMatrix();
@@ -290,7 +294,6 @@ void DesenhaMuro()
         glTranslated(1, 0, 0);
     }
     glPopMatrix();
-
 }
 
 // **********************************************************************
@@ -368,12 +371,12 @@ void PosicUser()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(-7, 5, 45, // Posi��o do Observador
-              -7, 0, 0,   // Posi��o do Alvo
+              -7, 0, 0,  // Posi��o do Alvo
               0.0f, 1.0f, 0.0f);
 
     // gluLookAt(-12, 30 , 15 , -7,0,0, 0,1,0);
 
-// Ponto CantoEsquerdo = Ponto(-20, -1, -10);
+    // Ponto CantoEsquerdo = Ponto(-20, -1, -10);
 }
 // **********************************************************************
 //  void reshape( int w, int h )
@@ -431,9 +434,9 @@ void display(void)
     // glPopMatrix();
 
     glPushMatrix();
-        DesenhaPiso();
-        glTranslatef(0, 3.5f, 15.5f);
-        DesenhaMuro();
+    DesenhaPiso();
+    glTranslatef(0, 3.5f, 15.5f);
+    DesenhaMuro();
     glPopMatrix();
 
     // glRotated(180, 0, 1, 0);
@@ -441,20 +444,22 @@ void display(void)
 
     // DesenhaCanhao(-7.0f, 0, 30.0f, cannonAngle);
 
-    for (int i=0; i<inimigos; i++) {
-        Dog& d = dogsList[i];
+    for (int i = 0; i < inimigos; i++)
+    {
+        Dog &d = dogsList[i];
         printf("Dog(%.2f, %.2f, %.2f)\n", d.x, d.y, d.z);
         glPushMatrix();
-            glTranslatef(d.x, d.y, d.z);
-            glRotatef(-90, 0, 1, 0);
-            glScalef(0.2,0.2,0.2);
-            if (d.inimigo) glColor3f(1.0f,0.0f,0.0f); //mudar, mto parecido com o deles
-            else           glColor3f(0.0f, 1.0f, 0.0f);
+        glTranslatef(d.x, d.y, d.z);
+        glRotatef(-90, 0, 1, 0);
+        glScalef(0.2, 0.2, 0.2);
+        if (d.inimigo)
+            glColor3f(1.0f, 0.0f, 0.0f); // mudar, mto parecido com o deles
+        else
+            glColor3f(0.0f, 1.0f, 0.0f);
 
-            dog.ExibeObjeto();
+        dog.ExibeObjeto();
         glPopMatrix();
     }
-    
 
     // // exibir as vacas
     // for (int i=0; i<N_AMIGOS_INIMIGOS; i++)
@@ -501,26 +506,26 @@ void keyboard(unsigned char key, int x, int y)
         borda = !borda;
         break;
     case 'd':
-        printf("\n%f",posCannon.x);
+        printf("\n%f", posCannon.x);
         if (posCannon.x < 2.75f)
-            posCannon.x+=0.25;
+            posCannon.x += 0.25;
         break;
     case 'a':
-        printf("\n%f",posCannon.x);
+        printf("\n%f", posCannon.x);
         if (posCannon.x > -18.50f)
-            posCannon.x-=0.25;
+            posCannon.x -= 0.25;
         break;
     case 'w':
         // variaY++;
         // printf("\n%f",posCannon.z);
         if (posCannon.z > 25)
-            posCannon.z-=0.25f;
+            posCannon.z -= 0.25f;
         break;
     case 's':
         // variaY--;
         // printf("\n%f",posCannon.z);
-        if (posCannon.z < 38.5f) 
-            posCannon.z+=0.25f;
+        if (posCannon.z < 38.5f)
+            posCannon.z += 0.25f;
         break;
     case 'q':
         variaPosX++;
@@ -543,27 +548,27 @@ void arrow_keys(int a_keys, int x, int y)
 {
     switch (a_keys)
     {
-    case GLUT_KEY_UP:     // When Up Arrow Is Pressed...
+    case GLUT_KEY_UP: // When Up Arrow Is Pressed...
         // glutFullScreen(); // Go Into Full Screen Mode
-        if (cannonAngle < 45) 
-            cannonAngle+=3;  
-        
+        if (cannonAngle < 45)
+            cannonAngle += 3;
+
         break;
     case GLUT_KEY_DOWN: // When Down Arrow Is Pressed...
         // glutInitWindowSize(700, 500);
         // if (cannonAngle >  )
         // printf("%f\n", cannonAngle);
-        if (cannonAngle > -10) 
-            cannonAngle-=3;
-        break;  
+        if (cannonAngle > -10)
+            cannonAngle -= 3;
+        break;
     case GLUT_KEY_RIGHT:
-        if (cannonBodyAngle-3 > -45.0) 
-            cannonBodyAngle-=3;
+        if (cannonBodyAngle - 3 > -45.0)
+            cannonBodyAngle -= 3;
         break;
     case GLUT_KEY_LEFT:
-        if (cannonBodyAngle+3 < 45.0) 
-            cannonBodyAngle+=3;
-        break;  
+        if (cannonBodyAngle + 3 < 45.0)
+            cannonBodyAngle += 3;
+        break;
     default:
         break;
     }
