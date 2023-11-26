@@ -189,6 +189,13 @@ void DesenhaParalelepipedo(float x, float y, float z, float scaleX, float sca)
     glPopMatrix();
 }
 
+void DesenhaTiro(Ponto p) {
+    glPushMatrix();
+        glColor3f(0,0,0);
+        glTranslatef(p.x, p.y, p.z);
+        glutSolidSphere(1, 50, 50);
+    glPopMatrix();   
+}
 
 void DesenhaCanhao(float cannonAngle, float cannonBodyAngle) {
     glPushMatrix();
