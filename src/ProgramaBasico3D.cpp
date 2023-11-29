@@ -62,6 +62,10 @@ float cannonAngle = 0;
 float cannonBodyAngle = 0;
 Ponto posCannon = Ponto(-7.0f, 0, 35.0f);
 
+float forcaTiro = 0;
+
+bool[][] muro_atingido;
+
 #define inimigos 20
 Objeto3D dog;
 struct Dog
@@ -102,14 +106,14 @@ void init(void)
     {
         Dog &d = dogsList[i];
         d.x = (posCannon.x - 10) + (rand() % 20);
-        // d.x = posCannon.x;
         d.y = posCannon.y;
         d.z = posCannon.z - 43.5 + (rand() % 22);
-        // d.z = posCannon.z;
         d.inimigo = i % 2 == 0;
         d.vivo = true;
     }
+    muro_atingido = new bool[25][15];
 }
+
 
 // **********************************************************************
 //
@@ -275,8 +279,6 @@ void DesenhaPiso()
     glPopMatrix();
 }
 
-bool muro_atingido[25][15];
-
 void DesenhaMuro()
 {
     glRotated(90, 1, 0, 0);
@@ -288,7 +290,8 @@ void DesenhaMuro()
         glPushMatrix();
         for (int y = 0; y < 15; y++)
         {
-            DesenhaLadrilho(DarkSlateBlue, SteelBlue, borda);
+            if (!muro_atingido[x][y])
+                DesenhaLadrilho(DarkSlateBlue, SteelBlue, borda);
             glTranslated(0, 0, 1);
         }
         glPopMatrix();
@@ -435,15 +438,12 @@ void display(void)
     // glPopMatrix();
 
     glPushMatrix();
-    DesenhaPiso();
-    glTranslatef(0, 3.5f, 15.5f);
-    DesenhaMuro();
+        DesenhaPiso();
+        glTranslatef(0, 3.5f, 15.5f);
+        DesenhaMuro();
     glPopMatrix();
 
-    // glRotated(180, 0, 1, 0);
     DesenhaCanhao(cannonAngle, cannonBodyAngle);
-
-    // DesenhaCanhao(-7.0f, 0, 30.0f, cannonAngle);
 
     for (int i = 0; i < inimigos; i++)
     {
@@ -462,22 +462,7 @@ void display(void)
         glPopMatrix();
     }
 
-    // // exibir as vacas
-    // for (int i=0; i<N_AMIGOS_INIMIGOS; i++)
-    // {
-    //     Vaca& v = vacas[i];
-    //     //printf("Vaca(%.2f, %.2f, %.2f)\n", v.posX, v.posY, v.posZ);
-    //     glPushMatrix();
-    //         glTranslatef(v.posX, v.posY, v.posZ);
-    //         glRotatef(-100, 1, 0, 0);
-    //         glRotatef(60, 0, 0, 1);
-    //         //glScalef(0.05, 0.05, 0.05);
-    //         glScalef(0.07, 0.07, 0.07);
-    //         if (v.inimigo) glColor3f(1.0f,0.0f,0.0f);
-    //         else           glColor3f(0.0f, 0.0f, 1.0f);
-    //         vacaModel.ExibeObjeto();
-    //     glPopMatrix();
-    // }
+    
 
     glutSwapBuffers();
 }
@@ -499,10 +484,14 @@ void keyboard(unsigned char key, int x, int y)
         glutPostRedisplay();
         break;
     case 'e':
-        cannonBodyAngle += 1;
+        if (forcaTiro < 10) {
+            forcaTiro += 1;
+        }
         break;
     case 'q':
-        cannonBodyAngle -= 1;
+        if (forcaTiro > 0) {
+            forcaTiro -= 1;
+        }
         break;
     case 'l':
         ModoDeExibicao = !ModoDeExibicao;
@@ -565,7 +554,7 @@ void arrow_keys(int a_keys, int x, int y)
         // glutInitWindowSize(700, 500);
         // if (cannonAngle >  )
         // printf("%f\n", cannonAngle);
-        if (cannonAngle > -10)
+        if (cannonAngle > 0)
             cannonAngle -= 3;
         break;
     case GLUT_KEY_RIGHT:
