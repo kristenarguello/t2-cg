@@ -257,13 +257,19 @@ void DesenhaTiro()
 {
     if (atirou && forcaTiro > 0.0f)
     {
-        CalculaTrajetoriaTiro();
         Ponto tiro = calculaCurva(exatoCanhao, topoTrajetoria, fimTrajetoria, jornada);
+        if (tiro.y < -3.0f)
+        {
+            jornada = 0.0;
+            atirou = false;
+            printf("TIRO CAIU\n");
+            return;
+        }
+
         DesenhaBolaCanhao(tiro, 0.3);
-        jornada += 0.0001;
         tiro = calculaCurva(exatoCanhao, topoTrajetoria, fimTrajetoria, jornada);
         DesenhaBolaCanhao(tiro, 0.3);
-        jornada += 0.08;
+        jornada += 0.02;
         if (jornada > 2.0)
         {
             jornada = 0.0;
@@ -292,7 +298,7 @@ void DesenhaCanhao(float cannonAngle, float cannonBodyAngle)
 }
 
 bool PodePassar()
-{   
+{
     if (posCannon.z == 27.25f) // nao ta no muro
     {
         int posMatrizX = (int)posCannon.x;
@@ -477,8 +483,8 @@ void PosicUser()
     //           0.0f, 1.0f, 0.0f);
     gluLookAt(posCannon.x, posCannon.y + 3, posCannon.z + 5,
               posCannon.x, posCannon.y + 3, posCannon.z, // Posi��o do Alvo
-              0.0f, 1.0f, 0.0f); //comentar esse dps, e deixar o de baixo!!!
-    // gluLookAt(13, 6, 55, 
+              0.0f, 1.0f, 0.0f);                         // comentar esse dps, e deixar o de baixo!!!
+    // gluLookAt(13, 6, 55,
     //         13, 1, 10,
     //         0.0f, 1.0f, 0.0f);
 
@@ -626,8 +632,10 @@ void keyboard(unsigned char key, int x, int y)
     case 'w':
         // variaY++;
         // printf("\n%f",posCannon.z);
-        if (PodePassar()) {
-            if (posCannon.z > 0.5f) {
+        if (PodePassar())
+        {
+            if (posCannon.z > 0.5f)
+            {
                 posCannon.z -= 0.25f;
             }
         }
@@ -635,8 +643,10 @@ void keyboard(unsigned char key, int x, int y)
     case 's':
         // variaY--;
         // printf("\n%f",posCannon.z);
-        if (PodePassar()) {
-            if (posCannon.z < 48.5f) {
+        if (PodePassar())
+        {
+            if (posCannon.z < 48.5f)
+            {
                 posCannon.z += 0.25f;
             }
         }
@@ -645,6 +655,7 @@ void keyboard(unsigned char key, int x, int y)
         variaPosX++;
         break;
     case ' ':
+        CalculaTrajetoriaTiro();
         muro_atingido[3][13] = true;
         muro_atingido[3][14] = true;
 
