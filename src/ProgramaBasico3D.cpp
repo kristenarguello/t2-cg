@@ -64,7 +64,7 @@ Ponto posCannon = Ponto(-7.0f, 0, 35.0f);
 
 float forcaTiro = 0;
 
-bool[][] muro_atingido;
+bool muro_atingido[25][15];
 
 #define inimigos 20
 Objeto3D dog;
@@ -111,7 +111,6 @@ void init(void)
         d.inimigo = i % 2 == 0;
         d.vivo = true;
     }
-    muro_atingido = new bool[25][15];
 }
 
 
@@ -126,7 +125,7 @@ void animate()
     TempoTotal += dt;
     nFrames++;
 
-    if (AccumDeltaT > 1.0 / 30) // fixa a atualiza��o da tela em 30
+    if (AccumDeltaT > 1.0 / 2) // fixa a atualiza��o da tela em 30
     {
         AccumDeltaT = 0;
         angulo += 1;
