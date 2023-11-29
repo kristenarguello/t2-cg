@@ -64,7 +64,7 @@ float cannonAngle = 0;
 float cannonBodyAngle = 0;
 Ponto posCannon = Ponto(13, 1, 45.0f);
 
-float forcaTiro = 0;
+float forcaTiro = 0.0f;
 
 bool muro_atingido[25][15];
 // vector<bool> linha
@@ -206,6 +206,9 @@ void DesenhaTiro(Ponto p)
     glPopMatrix();
 }
 
+Ponto exatoCanhao;
+Ponto topoTrajetoria;
+Ponto fimTrajetoria;
 void CalculaTrajetoriaTiro()
 {
     Ponto sentidoAponta = Ponto(0, 0, -1);
@@ -213,28 +216,61 @@ void CalculaTrajetoriaTiro()
     sentidoAponta.rotacionaY(cannonBodyAngle);
 
     float norm = sqrt(pow(sentidoAponta.x, 2) + pow(sentidoAponta.y, 2) + pow(sentidoAponta.z, 2));
-    if (norm != 0)
+    if (norm != 0.0)
     {
         sentidoAponta.x /= norm;
         sentidoAponta.y /= norm;
         sentidoAponta.z /= norm;
     }
-    Ponto exatoCanhao = posCannon + Ponto(0, 0.5f, -0.4f);
+    exatoCanhao = posCannon + Ponto(0, 0.5f, -0.4f);
     // Ponto exatoCanhao = Ponto(posCannon.x, posCannon.y + 0.5f, posCannon.z - 0.4f);
-    Ponto topoTrajetoria = exatoCanhao + (sentidoAponta * forcaTiro) * 0.6 * forcaTiro;
-    Ponto fimTrajetoria = topoTrajetoria + (sentidoAponta * forcaTiro) * forcaTiro;
+    topoTrajetoria = exatoCanhao + (sentidoAponta * forcaTiro) * 0.6 * forcaTiro;
+    fimTrajetoria = topoTrajetoria + (sentidoAponta * forcaTiro) * forcaTiro; // ta igual ao de cima
+    fimTrajetoria.y = -10;
 
     // esse calculo nao ta levando em consideracao o angulo do canhao estar pra tras
 
     // alem de que nao ta pronto!!!
 }
 
-// calcular curva be bezier com os pontos
-// Ponto calculaCurva()
-// {
-// }
+void DesenhaBolaCanhao(Ponto p, float raio)
+{
+    glPushMatrix();
+    glColor3f(1.0, 1.0, 1.0);
+    glTranslatef(p.x, p.y, p.z);
+    glutSolidSphere(raio, 50, 50);
+    glPopMatrix();
+}
 
-//
+Ponto calculaCurva(Ponto posicaoInicial, Ponto posicaoTopo, Ponto posicaoFinal, double t)
+{
+    Ponto P;
+    double UmMenosT = 1 - t;
+
+    P = posicaoInicial * UmMenosT * UmMenosT + posicaoTopo * 2 * UmMenosT * t + posicaoFinal * t * t;
+    return P;
+}
+
+bool atirou = false;
+float jornada = 0.0;
+void DesenhaTiro()
+{
+    if (atirou && forcaTiro > 0.0f)
+    {
+        CalculaTrajetoriaTiro();
+        Ponto tiro = calculaCurva(exatoCanhao, topoTrajetoria, fimTrajetoria, jornada);
+        DesenhaBolaCanhao(tiro, 0.3);
+        jornada += 0.0001;
+        tiro = calculaCurva(exatoCanhao, topoTrajetoria, fimTrajetoria, jornada);
+        DesenhaBolaCanhao(tiro, 0.3);
+        jornada += 0.08;
+        if (jornada > 2.0)
+        {
+            jornada = 0.0;
+            atirou = false;
+        }
+    }
+}
 
 void DesenhaCanhao(float cannonAngle, float cannonBodyAngle)
 {
@@ -529,6 +565,7 @@ void display(void)
         dog.ExibeObjeto();
         glPopMatrix();
     }
+    DesenhaTiro();
 
     glutSwapBuffers();
 }
@@ -550,15 +587,21 @@ void keyboard(unsigned char key, int x, int y)
         glutPostRedisplay();
         break;
     case 'e':
-        if (forcaTiro < 10)
+        if (!atirou)
         {
-            forcaTiro += 1;
+            if (forcaTiro < 10)
+            {
+                forcaTiro += 1;
+            }
         }
         break;
     case 'q':
-        if (forcaTiro > 0)
+        if (!atirou)
         {
-            forcaTiro -= 1;
+            if (forcaTiro > 0)
+            {
+                forcaTiro -= 1;
+            }
         }
         break;
     case 'l':
@@ -606,6 +649,8 @@ void keyboard(unsigned char key, int x, int y)
         muro_atingido[4][14] = true;
 
         printf("TIRO\n");
+        if (forcaTiro > 0.0f)
+            atirou = true;
         break;
     default:
         cout << key;
@@ -623,25 +668,25 @@ void arrow_keys(int a_keys, int x, int y)
     switch (a_keys)
     {
     case GLUT_KEY_UP: // When Up Arrow Is Pressed...
-        // glutFullScreen(); // Go Into Full Screen Mode
-        if (cannonAngle < 45)
-            cannonAngle += 3;
+                      // glutFullScreen(); // Go Into Full Screen Mode
+                      // if (cannonAngle < 45)
+        cannonAngle += 3;
 
         break;
     case GLUT_KEY_DOWN: // When Down Arrow Is Pressed...
-        // glutInitWindowSize(700, 500);
-        // if (cannonAngle >  )
-        // printf("%f\n", cannonAngle);
-        if (cannonAngle > 0)
-            cannonAngle -= 3;
+                        // glutInitWindowSize(700, 500);
+                        // if (cannonAngle >  )
+                        // printf("%f\n", cannonAngle);
+                        // if (cannonAngle > 0)
+        cannonAngle -= 3;
         break;
     case GLUT_KEY_RIGHT:
-        if (cannonBodyAngle - 3 > -45.0)
-            cannonBodyAngle -= 3;
+        // if (cannonBodyAngle - 3 > -45.0)
+        cannonBodyAngle -= 3;
         break;
     case GLUT_KEY_LEFT:
-        if (cannonBodyAngle + 3 < 45.0)
-            cannonBodyAngle += 3;
+        // if (cannonBodyAngle + 3 < 45.0)
+        cannonBodyAngle += 3;
         break;
     default:
         break;
