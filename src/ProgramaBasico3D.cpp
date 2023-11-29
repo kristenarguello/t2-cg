@@ -11,6 +11,7 @@
 #include <iostream>
 #include <cmath>
 #include <ctime>
+#include <vector>
 
 using namespace std;
 
@@ -53,14 +54,15 @@ int ModoDeExibicao = 1;
 
 double nFrames = 0;
 double TempoTotal = 0;
-Ponto CantoEsquerdo = Ponto(-20, -1, -10);
+Ponto CantoEsquerdo = Ponto(0, 0, 0);
+// -20, -1, -10
 bool borda = false;
 
 float variaPosX = -4.0f;
 
 float cannonAngle = 0;
 float cannonBodyAngle = 0;
-Ponto posCannon = Ponto(-7.0f, 0, 35.0f);
+Ponto posCannon = Ponto(13, 1, 45.0f);
 
 float forcaTiro = 0;
 
@@ -125,7 +127,7 @@ void animate()
     TempoTotal += dt;
     nFrames++;
 
-    if (AccumDeltaT > 1.0 / 2) // fixa a atualiza��o da tela em 30
+    if (AccumDeltaT > 1.0 / 30) // fixa a atualiza��o da tela em 30
     {
         AccumDeltaT = 0;
         angulo += 1;
@@ -203,6 +205,29 @@ void DesenhaTiro(Ponto p)
     glPopMatrix();
 }
 
+void CalculaTrajetoriaTiro() {
+    Ponto sentidoAponta = Ponto(0, 0 ,-1);
+    sentidoAponta.rotacionaX(cannonAngle);
+    sentidoAponta.rotacionaY(cannonBodyAngle);
+
+    float norm = sqrt(pow(sentidoAponta.x, 2) + pow(sentidoAponta.y, 2) + pow(sentidoAponta.z, 2));
+    if (norm != 0) {
+        sentidoAponta.x /= norm;
+        sentidoAponta.y /= norm;
+        sentidoAponta.z /= norm;
+    }
+    Ponto exatoCanhao = posCannon + Ponto(0, 0.5f, -0.4f);
+    // Ponto exatoCanhao = Ponto(posCannon.x, posCannon.y + 0.5f, posCannon.z - 0.4f);
+    Ponto topoTrajetoria = exatoCanhao + (sentidoAponta * forcaTiro) * 0.6 * forcaTiro;
+    Ponto fimTrajetoria = topoTrajetoria + (sentidoAponta * forcaTiro) * forcaTiro;
+
+    //esse calculo nao ta levando em consideracao o angulo do canhao estar pra tras
+
+    //alem de que nao ta pronto!!! 
+
+
+}
+
 void DesenhaCanhao(float cannonAngle, float cannonBodyAngle)
 {
     glPushMatrix();
@@ -220,6 +245,39 @@ void DesenhaCanhao(float cannonAngle, float cannonBodyAngle)
     glScalef(0.3f, 0.3f, 0.7f);
     glutSolidCube(1);
     glPopMatrix();
+}
+
+bool PodePassar() {
+    if (posCannon.z == 27.25f) {
+        //y sempre fixo nos dois mais de baixo
+        printf("\nX:   %f", posCannon.x);
+
+        // x varia de 0.25 em 0.25
+        //tam do x = 2 -> 8 posicoes opssiveis pra passar no mesmo buraco?
+            // bem esquerda no x = 0, e cresce ate 25(bem direita)
+            // coordenada indica posicao na matriz!!!
+
+        // y = 0 e 1 -> la embaixo do muro
+        // x = 
+            // os bem do canto na contam assim, contam como se fosse uma extremidade, ai em cima e embaixo pra passar, e um do lado
+            // a
+            // c d --> ou ao contrario disso
+
+        //   b 
+        // d e f --> desenho dos espacos que tem que estar abertos para ele passar
+        
+        //considerar a troca do negativo pro positivo (talvez se mudarmos o sistema de coordenadas acho que facilita)
+        // bool a = muro_atingido[(int)posCannon.x + 20][(int)posCannon.z - 16];
+        // if (muro_atingido[][14] && muro_atingido[][13]) {
+        //     return true;
+        // }
+
+
+
+        printf("NO MURO!");
+        return false;
+    }
+    return true;
 }
 
 // **********************************************************************
@@ -373,9 +431,12 @@ void PosicUser()
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(-7, 5, 45, // Posi��o do Observador
-              -7, 0, 0,  // Posi��o do Alvo
-              0.0f, 1.0f, 0.0f);
+    // gluLookAt(-7, 5, 45, // Posi��o do Observador
+    //           -7, 0, 0,  // Posi��o do Alvo
+    //           0.0f, 1.0f, 0.0f);
+    gluLookAt(posCannon.x, posCannon.y + 3, posCannon.z + 5,
+            posCannon.x, posCannon.y + 3, posCannon.z,  // Posi��o do Alvo
+            0.0f, 1.0f, 0.0f);
 
     // gluLookAt(-12, 30 , 15 , -7,0,0, 0,1,0);
 
@@ -438,7 +499,8 @@ void display(void)
 
     glPushMatrix();
         DesenhaPiso();
-        glTranslatef(0, 3.5f, 15.5f);
+        //-20, -1, -10
+        glTranslatef(0, 14, 25.5f);
         DesenhaMuro();
     glPopMatrix();
 
@@ -501,25 +563,26 @@ void keyboard(unsigned char key, int x, int y)
         borda = !borda;
         break;
     case 'd':
-        printf("\n%f", posCannon.x);
-        if (posCannon.x < 2.75f)
+        // printf("\n%f", posCannon.x);
+        if (posCannon.x < 23.5f)
             posCannon.x += 0.25;
         break;
     case 'a':
-        printf("\n%f", posCannon.x);
-        if (posCannon.x > -18.50f)
+        // printf("\n%f", posCannon.x);
+        if (posCannon.x > 0.5f)
             posCannon.x -= 0.25;
         break;
     case 'w':
         // variaY++;
         // printf("\n%f",posCannon.z);
-        if (posCannon.z > 25)
+
+        if (PodePassar())
             posCannon.z -= 0.25f;
         break;
     case 's':
         // variaY--;
         // printf("\n%f",posCannon.z);
-        if (posCannon.z < 38.5f)
+        if (posCannon.z < 48.5f)
             posCannon.z += 0.25f;
         break;
     case 'v':
