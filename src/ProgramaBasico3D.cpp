@@ -251,6 +251,39 @@ Ponto calculaCurva(Ponto posicaoInicial, Ponto posicaoTopo, Ponto posicaoFinal, 
     return P;
 }
 
+bool ChecaColisaoDog(Ponto tiro)
+{
+    for (int i = 0; i < inimigos; i++)
+    {
+        Dog &d = dogsList[i];
+        if (d.vivo)
+        {
+            if (-1 < tiro.y && tiro.y < d.y + 2)
+            {
+                if (d.x - 1 < tiro.x && tiro.x < d.x + 1)
+                {
+                    if (d.z - 1 < tiro.z && tiro.z < d.z + 1)
+                    {
+                        printf("TIRO ACERTOU\n");
+                        d.vivo = false;
+                        if (d.inimigo)
+                        {
+                            printf("+10 pontos\n");
+                            return true;
+                        }
+                        else
+                        {
+                            printf("-10 pontos\n");
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
 bool atirou = false;
 float jornada = 0.0;
 void DesenhaTiro()
@@ -263,6 +296,13 @@ void DesenhaTiro()
             jornada = 0.0;
             atirou = false;
             printf("TIRO CAIU\n");
+            printf("-5 ponto\n");
+            return;
+        }
+        if (ChecaColisaoDog(tiro))
+        {
+            jornada = 0.0;
+            atirou = false;
             return;
         }
 
@@ -559,18 +599,21 @@ void display(void)
     for (int i = 0; i < inimigos; i++)
     {
         Dog &d = dogsList[i];
-        // printf("Dog(%.2f, %.2f, %.2f)\n", d.x, d.y, d.z);
-        glPushMatrix();
-        glTranslatef(d.x, d.y, d.z);
-        glRotatef(-90, 0, 1, 0);
-        glScalef(0.2, 0.2, 0.2);
-        if (d.inimigo)
-            glColor3f(1.0f, 0.0f, 0.0f); // mudar, mto parecido com o deles
-        else
-            glColor3f(0.0f, 1.0f, 0.0f);
+        if (d.vivo)
+        {
+            // printf("Dog(%.2f, %.2f, %.2f)\n", d.x, d.y, d.z);
+            glPushMatrix();
+            glTranslatef(d.x, d.y, d.z);
+            glRotatef(-90, 0, 1, 0);
+            glScalef(0.2, 0.2, 0.2);
+            if (d.inimigo)
+                glColor3f(1.0f, 0.0f, 0.0f); // mudar, mto parecido com o deles
+            else
+                glColor3f(0.0f, 1.0f, 0.0f);
 
-        dog.ExibeObjeto();
-        glPopMatrix();
+            dog.ExibeObjeto();
+            glPopMatrix();
+        }
     }
     DesenhaTiro();
 
@@ -721,7 +764,7 @@ int main(int argc, char **argv)
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGB);
     glutInitWindowPosition(0, 0);
     glutInitWindowSize(700, 700);
-    glutCreateWindow("Computacao Grafica - Exemplo Basico 3D");
+    glutCreateWindow("Computacao Grafica - Trabalho 2 Ramiro e Kristen");
 
     init();
     // system("pwd");
