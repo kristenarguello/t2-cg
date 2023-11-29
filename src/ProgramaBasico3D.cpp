@@ -67,6 +67,8 @@ Ponto posCannon = Ponto(13, 1, 45.0f);
 float forcaTiro = 0;
 
 bool muro_atingido[25][15];
+// vector<bool> linha
+//  vector<int> v1(10,-1);
 
 #define inimigos 20
 Objeto3D dog;
@@ -107,14 +109,13 @@ void init(void)
     for (int i = 0; i < inimigos; i++)
     {
         Dog &d = dogsList[i];
-        d.x = (posCannon.x - 10) + (rand() % 20);
-        d.y = posCannon.y;
-        d.z = posCannon.z - 43.5 + (rand() % 22);
+        d.x = CantoEsquerdo.x + (rand() % 22);
+        d.y = CantoEsquerdo.y + 1;
+        d.z = CantoEsquerdo.z + (rand() % 22);
         d.inimigo = i % 2 == 0;
         d.vivo = true;
     }
 }
-
 
 // **********************************************************************
 //
@@ -205,13 +206,15 @@ void DesenhaTiro(Ponto p)
     glPopMatrix();
 }
 
-void CalculaTrajetoriaTiro() {
-    Ponto sentidoAponta = Ponto(0, 0 ,-1);
+void CalculaTrajetoriaTiro()
+{
+    Ponto sentidoAponta = Ponto(0, 0, -1);
     sentidoAponta.rotacionaX(cannonAngle);
     sentidoAponta.rotacionaY(cannonBodyAngle);
 
     float norm = sqrt(pow(sentidoAponta.x, 2) + pow(sentidoAponta.y, 2) + pow(sentidoAponta.z, 2));
-    if (norm != 0) {
+    if (norm != 0)
+    {
         sentidoAponta.x /= norm;
         sentidoAponta.y /= norm;
         sentidoAponta.z /= norm;
@@ -221,12 +224,17 @@ void CalculaTrajetoriaTiro() {
     Ponto topoTrajetoria = exatoCanhao + (sentidoAponta * forcaTiro) * 0.6 * forcaTiro;
     Ponto fimTrajetoria = topoTrajetoria + (sentidoAponta * forcaTiro) * forcaTiro;
 
-    //esse calculo nao ta levando em consideracao o angulo do canhao estar pra tras
+    // esse calculo nao ta levando em consideracao o angulo do canhao estar pra tras
 
-    //alem de que nao ta pronto!!! 
-
-
+    // alem de que nao ta pronto!!!
 }
+
+// calcular curva be bezier com os pontos
+// Ponto calculaCurva()
+// {
+// }
+
+//
 
 void DesenhaCanhao(float cannonAngle, float cannonBodyAngle)
 {
@@ -247,35 +255,32 @@ void DesenhaCanhao(float cannonAngle, float cannonBodyAngle)
     glPopMatrix();
 }
 
-bool PodePassar() {
-    if (posCannon.z == 27.25f) {
-        //y sempre fixo nos dois mais de baixo
+bool PodePassar()
+{
+    if (posCannon.z <= 27.25f) // nao ta no muro
+    {
+        printf("\nZ: %f", posCannon.z);
         printf("\nX:   %f", posCannon.x);
+        int posMatrizX = (int)posCannon.x;
+        printf("\nPOSMATRIX: %d", posMatrizX);
 
-        // x varia de 0.25 em 0.25
-        //tam do x = 2 -> 8 posicoes opssiveis pra passar no mesmo buraco?
-            // bem esquerda no x = 0, e cresce ate 25(bem direita)
-            // coordenada indica posicao na matriz!!!
+        vector<int> posicoesX;
+        posicoesX.push_back(posMatrizX);
+        if (posMatrizX > 0) // se nao for extremidade esquerda
+            posicoesX.push_back(posMatrizX - 1);
+        if (posMatrizX < 24) // se nao for extremidade direita
+            posicoesX.push_back(posMatrizX + 1);
 
-        // y = 0 e 1 -> la embaixo do muro
-        // x = 
-            // os bem do canto na contam assim, contam como se fosse uma extremidade, ai em cima e embaixo pra passar, e um do lado
-            // a
-            // c d --> ou ao contrario disso
+        // vetor posicoesX vai ter todas as posicoes x que precisam ser analisadas pra ver se da pra passar,
+        // se for extremiadde ele desconsidera posicoes inexistentes, se nao ele pega o do meio e os dos lados
 
-        //   b 
-        // d e f --> desenho dos espacos que tem que estar abertos para ele passar
-        
-        //considerar a troca do negativo pro positivo (talvez se mudarmos o sistema de coordenadas acho que facilita)
-        // bool a = muro_atingido[(int)posCannon.x + 20][(int)posCannon.z - 16];
-        // if (muro_atingido[][14] && muro_atingido[][13]) {
-        //     return true;
-        // }
-
-
-
-        printf("NO MURO!");
-        return false;
+        bool podePassar = true;                    // comeca como false
+        for (int i = 0; i < posicoesX.size(); i++) // itera pelas posicoes que precisa conferir
+        {
+            podePassar = podePassar && muro_atingido[posicoesX[i]][13]; // de cima
+            podePassar = podePassar && muro_atingido[posicoesX[i]][14]; // de baixo
+        }
+        return podePassar;
     }
     return true;
 }
@@ -348,7 +353,9 @@ void DesenhaMuro()
         for (int y = 0; y < 15; y++)
         {
             if (!muro_atingido[x][y])
+            {
                 DesenhaLadrilho(DarkSlateBlue, SteelBlue, borda);
+            }
             glTranslated(0, 0, 1);
         }
         glPopMatrix();
@@ -435,8 +442,8 @@ void PosicUser()
     //           -7, 0, 0,  // Posi��o do Alvo
     //           0.0f, 1.0f, 0.0f);
     gluLookAt(posCannon.x, posCannon.y + 3, posCannon.z + 5,
-            posCannon.x, posCannon.y + 3, posCannon.z,  // Posi��o do Alvo
-            0.0f, 1.0f, 0.0f);
+              posCannon.x, posCannon.y + 3, posCannon.z, // Posi��o do Alvo
+              0.0f, 1.0f, 0.0f);
 
     // gluLookAt(-12, 30 , 15 , -7,0,0, 0,1,0);
 
@@ -498,10 +505,10 @@ void display(void)
     // glPopMatrix();
 
     glPushMatrix();
-        DesenhaPiso();
-        //-20, -1, -10
-        glTranslatef(0, 14, 25.5f);
-        DesenhaMuro();
+    DesenhaPiso();
+    //-20, -1, -10
+    glTranslatef(0, 14.5f, 25.5f);
+    DesenhaMuro();
     glPopMatrix();
 
     DesenhaCanhao(cannonAngle, cannonBodyAngle);
@@ -523,8 +530,6 @@ void display(void)
         glPopMatrix();
     }
 
-    
-
     glutSwapBuffers();
 }
 
@@ -545,12 +550,14 @@ void keyboard(unsigned char key, int x, int y)
         glutPostRedisplay();
         break;
     case 'e':
-        if (forcaTiro < 10) {
+        if (forcaTiro < 10)
+        {
             forcaTiro += 1;
         }
         break;
     case 'q':
-        if (forcaTiro > 0) {
+        if (forcaTiro > 0)
+        {
             forcaTiro -= 1;
         }
         break;
@@ -564,12 +571,12 @@ void keyboard(unsigned char key, int x, int y)
         break;
     case 'd':
         // printf("\n%f", posCannon.x);
-        if (posCannon.x < 23.5f)
+        if (posCannon.x < 24.8f)
             posCannon.x += 0.25;
         break;
     case 'a':
         // printf("\n%f", posCannon.x);
-        if (posCannon.x > 0.5f)
+        if (posCannon.x > 0.2f)
             posCannon.x -= 0.25;
         break;
     case 'w':
@@ -589,6 +596,15 @@ void keyboard(unsigned char key, int x, int y)
         variaPosX++;
         break;
     case ' ':
+        muro_atingido[3][13] = true;
+        muro_atingido[3][14] = true;
+
+        muro_atingido[2][13] = true;
+        muro_atingido[2][14] = true;
+
+        muro_atingido[4][13] = true;
+        muro_atingido[4][14] = true;
+
         printf("TIRO\n");
         break;
     default:
