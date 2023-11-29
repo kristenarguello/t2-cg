@@ -275,9 +275,10 @@ void DesenhaPiso()
     glPopMatrix();
 }
 
+bool muro_atingido[25][15];
+
 void DesenhaMuro()
 {
-
     glRotated(90, 1, 0, 0);
     srand(100); // usa uma semente fixa para gerar sempre as mesma cores no piso
     glPushMatrix();
@@ -447,7 +448,7 @@ void display(void)
     for (int i = 0; i < inimigos; i++)
     {
         Dog &d = dogsList[i];
-        printf("Dog(%.2f, %.2f, %.2f)\n", d.x, d.y, d.z);
+        // printf("Dog(%.2f, %.2f, %.2f)\n", d.x, d.y, d.z);
         glPushMatrix();
         glTranslatef(d.x, d.y, d.z);
         glRotatef(-90, 0, 1, 0);
@@ -498,6 +499,12 @@ void keyboard(unsigned char key, int x, int y)
         glutPostRedisplay();
         break;
     case 'e':
+        cannonBodyAngle += 1;
+        break;
+    case 'q':
+        cannonBodyAngle -= 1;
+        break;
+    case 'l':
         ModoDeExibicao = !ModoDeExibicao;
         init();
         glutPostRedisplay();
@@ -527,7 +534,7 @@ void keyboard(unsigned char key, int x, int y)
         if (posCannon.z < 38.5f)
             posCannon.z += 0.25f;
         break;
-    case 'q':
+    case 'v':
         variaPosX++;
         break;
     case ' ':
