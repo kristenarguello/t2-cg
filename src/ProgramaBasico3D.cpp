@@ -109,9 +109,9 @@ void init(void)
     for (int i = 0; i < inimigos; i++)
     {
         Dog &d = dogsList[i];
-        d.x = CantoEsquerdo.x + (rand() % 22);
-        d.y = CantoEsquerdo.y + 1;
-        d.z = CantoEsquerdo.z + (rand() % 22);
+        d.x = CantoEsquerdo.x + 2 + (rand() % 22);
+        d.y = CantoEsquerdo.y;
+        d.z = CantoEsquerdo.z + 2 + (rand() % 22);
         d.inimigo = i % 2 == 0;
         d.vivo = true;
     }
@@ -292,13 +292,10 @@ void DesenhaCanhao(float cannonAngle, float cannonBodyAngle)
 }
 
 bool PodePassar()
-{
-    if (posCannon.z <= 27.25f) // nao ta no muro
+{   
+    if (posCannon.z == 27.25f) // nao ta no muro
     {
-        printf("\nZ: %f", posCannon.z);
-        printf("\nX:   %f", posCannon.x);
         int posMatrizX = (int)posCannon.x;
-        printf("\nPOSMATRIX: %d", posMatrizX);
 
         vector<int> posicoesX;
         posicoesX.push_back(posMatrizX);
@@ -474,12 +471,16 @@ void PosicUser()
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    // -20, -1 ,-10
     // gluLookAt(-7, 5, 45, // Posi��o do Observador
     //           -7, 0, 0,  // Posi��o do Alvo
     //           0.0f, 1.0f, 0.0f);
     gluLookAt(posCannon.x, posCannon.y + 3, posCannon.z + 5,
               posCannon.x, posCannon.y + 3, posCannon.z, // Posi��o do Alvo
-              0.0f, 1.0f, 0.0f);
+              0.0f, 1.0f, 0.0f); //comentar esse dps, e deixar o de baixo!!!
+    // gluLookAt(13, 6, 55, 
+    //         13, 1, 10,
+    //         0.0f, 1.0f, 0.0f);
 
     // gluLookAt(-12, 30 , 15 , -7,0,0, 0,1,0);
 
@@ -625,15 +626,20 @@ void keyboard(unsigned char key, int x, int y)
     case 'w':
         // variaY++;
         // printf("\n%f",posCannon.z);
-
-        if (PodePassar())
-            posCannon.z -= 0.25f;
+        if (PodePassar()) {
+            if (posCannon.z > 0.5f) {
+                posCannon.z -= 0.25f;
+            }
+        }
         break;
     case 's':
         // variaY--;
         // printf("\n%f",posCannon.z);
-        if (posCannon.z < 48.5f)
-            posCannon.z += 0.25f;
+        if (PodePassar()) {
+            if (posCannon.z < 48.5f) {
+                posCannon.z += 0.25f;
+            }
+        }
         break;
     case 'v':
         variaPosX++;
@@ -647,7 +653,7 @@ void keyboard(unsigned char key, int x, int y)
 
         muro_atingido[4][13] = true;
         muro_atingido[4][14] = true;
-
+        posCannon.imprime();
         printf("TIRO\n");
         if (forcaTiro > 0.0f)
             atirou = true;
