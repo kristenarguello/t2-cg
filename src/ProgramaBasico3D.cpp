@@ -63,8 +63,9 @@ float variaPosX = -4.0f;
 float cannonAngle = 0;
 float cannonBodyAngle = 0;
 Ponto posCannon = Ponto(13, 1, 45.0f);
+Ponto tiro = Ponto(-100,0,-10);
 
-float forcaTiro = 0.0f;
+float forcaTiro = 2;
 
 bool muro_atingido[25][15];
 // vector<bool> linha
@@ -245,9 +246,8 @@ void DesenhaBolaCanhao(Ponto p, float raio)
 Ponto calculaCurva(Ponto posicaoInicial, Ponto posicaoTopo, Ponto posicaoFinal, double t)
 {
     Ponto P;
-    double UmMenosT = 1 - t;
 
-    P = posicaoInicial * UmMenosT * UmMenosT + posicaoTopo * 2 * UmMenosT * t + posicaoFinal * t * t;
+    P = posicaoInicial * (1 - t) * (1 - t) + posicaoTopo * 2 * (1 - t) * t + posicaoFinal * t * t;
     return P;
 }
 
@@ -290,7 +290,7 @@ void DesenhaTiro()
 {
     if (atirou && forcaTiro > 0.0f)
     {
-        Ponto tiro = calculaCurva(exatoCanhao, topoTrajetoria, fimTrajetoria, jornada);
+        tiro = calculaCurva(exatoCanhao, topoTrajetoria, fimTrajetoria, jornada);
         if (tiro.y < -3.0f)
         {
             jornada = 0.0;
@@ -339,7 +339,7 @@ void DesenhaCanhao(float cannonAngle, float cannonBodyAngle)
 
 bool PodePassar()
 {
-    if (posCannon.z == 27.25f) // nao ta no muro
+    if (posCannon.z == 27.25f || posCannon.z == 23.5f) // nao ta no muro
     {
         int posMatrizX = (int)posCannon.x;
 
@@ -441,6 +441,36 @@ void DesenhaMuro()
         glTranslated(1, 0, 0);
     }
     glPopMatrix();
+}
+
+void ColisaoMuro() {
+    // tiro.imprime();
+    // printf("\n%f", tiro.z);
+        if (tiro.z < 27.25f && tiro.z > 26.25f) {
+            int posMatrizX = (int)tiro.x;
+
+            vector<int> posicoesX;
+            posicoesX.push_back(posMatrizX);
+            if (posMatrizX > 0) // se nao for extremidade esquerda
+                posicoesX.push_back(posMatrizX - 1);
+            if (posMatrizX < 24) // se nao for extremidade direita
+                posicoesX.push_back(posMatrizX + 1);
+            
+            int posMatrizY = abs((int)tiro.y - 14);
+            vector<int> posicoesY;
+            posicoesY.push_back(posMatrizY);
+            if (posMatrizY > 0) // se nao for extremidade emcima (matriz em cima é 0)
+                posicoesY.push_back(posMatrizY - 1); 
+            if (posMatrizY < 14) // se nao for extremidade abaixo (matriz embaixo é 14) 
+                posicoesY.push_back(posMatrizY + 1);
+            
+            for (int i = 0; i < posicoesX.size(); i++) {
+                for (int j = 0; j < posicoesY.size(); j++) {
+                    muro_atingido[posicoesX[i]][posicoesY[j]] = true;
+                }
+            }
+        }
+     
 }
 
 // **********************************************************************
@@ -616,6 +646,9 @@ void display(void)
         }
     }
     DesenhaTiro();
+    if (atirou) {
+        ColisaoMuro();
+    }
 
     glutSwapBuffers();
 }
@@ -637,18 +670,20 @@ void keyboard(unsigned char key, int x, int y)
         glutPostRedisplay();
         break;
     case 'e':
+        printf("\nA velocidade do tiro é: %f\n", forcaTiro);
         if (!atirou)
         {
-            if (forcaTiro < 10)
+            if (forcaTiro < 6)
             {
                 forcaTiro += 1;
             }
         }
         break;
     case 'q':
+        printf("\nA velocidade do tiro é: %f\n", forcaTiro);
         if (!atirou)
         {
-            if (forcaTiro > 0)
+            if (forcaTiro > 1)
             {
                 forcaTiro -= 1;
             }
@@ -699,16 +734,16 @@ void keyboard(unsigned char key, int x, int y)
         break;
     case ' ':
         CalculaTrajetoriaTiro();
-        muro_atingido[3][13] = true;
-        muro_atingido[3][14] = true;
+        // muro_atingido[3][13] = true;
+        // muro_atingido[3][14] = true;
 
-        muro_atingido[2][13] = true;
-        muro_atingido[2][14] = true;
+        // muro_atingido[2][13] = true;
+        // muro_atingido[2][14] = true;
 
-        muro_atingido[4][13] = true;
-        muro_atingido[4][14] = true;
-        posCannon.imprime();
-        printf("TIRO\n");
+        // muro_atingido[4][13] = true;
+        // muro_atingido[4][14] = true;
+        // posCannon.imprime();
+        // printf("TIRO\n");
         if (forcaTiro > 0.0f)
             atirou = true;
         break;
