@@ -64,7 +64,7 @@ float variaPosX = -4.0f;
 
 float cannonAngle = 0;
 float cannonBodyAngle = 0;
-Ponto posCannon = Ponto(13, 0, 45.0f);
+Ponto posCannon = Ponto(13, 0.5, 45.0f);
 Ponto tiro = Ponto(-100, 0, -10);
 
 float forcaTiro = 4;
@@ -304,16 +304,16 @@ void DesenhaTiro()
     if (atirou && forcaTiro > 2.0f)
     {
         tiro = calculaCurva(exatoCanhao, topoTrajetoria, fimTrajetoria, jornada);
-        if (tiro.y < -3.0f)
-        {
-            jornada = 0.0;
-            atirou = false;
-            printf("TIRO CAIU\n");
-            printf("-5 pontos\n");
-            pontuacao -= 5;
-            printf("Pontuação atual: %d\n\n", pontuacao);
-            return;
-        }
+        // if (tiro.y < -3.0f)
+        // {
+        //     jornada = 0.0;
+        //     atirou = false;
+        //     printf("TIRO CAIU\n");
+        //     printf("-5 pontos\n");
+        //     pontuacao -= 5;
+        //     printf("Pontuação atual: %d\n\n", pontuacao);
+        //     return;
+        // }
         if (ChecaColisaoDog(tiro))
         {
             jornada = 0.0;
@@ -360,15 +360,18 @@ void DesenhaCanhao(float cannonAngle, float cannonBodyAngle)
 bool PodePassar(string opcao)
 {
     if (((int)posCannon.z) == 27 || ((int)posCannon.z) == 23) // nao ta no muro
-    {   
+    {
         // se estiver voltando = ou seja, diminuir o maior numero de opcao, e quiser aumentar = pode
-                                        // ou aumentar o menor numero de opcao, e quiser diminuir = pode
-        if (opcao == "aumentar" && ((int)posCannon.z) == 27) {
-            return true;
-        } else if (opcao == "diminuir" && ((int)posCannon.z) == 23) {
+        // ou aumentar o menor numero de opcao, e quiser diminuir = pode
+        if (opcao == "aumentar" && ((int)posCannon.z) == 27)
+        {
             return true;
         }
-    
+        else if (opcao == "diminuir" && ((int)posCannon.z) == 23)
+        {
+            return true;
+        }
+
         int posMatrizX = (int)posCannon.x;
 
         vector<int> posicoesX;
@@ -388,8 +391,6 @@ bool PodePassar(string opcao)
             podePassar = podePassar && muro_atingido[posicoesX[i]][14]; // de baixo
         }
         return podePassar;
-        
-
     }
     return true;
 }
@@ -431,6 +432,7 @@ void DesenhaLadrilho(int corBorda, int corDentro, bool borda)
 //
 //
 // **********************************************************************
+bool chao_atingido[50][25];
 void DesenhaPiso()
 {
     srand(100); // usa uma semente fixa para gerar sempre as mesma cores no piso
@@ -441,7 +443,10 @@ void DesenhaPiso()
         glPushMatrix();
         for (int z = 0; z < 50; z++)
         {
-            DesenhaLadrilho(DarkSlateBlue, SteelBlue, borda);
+            if (!chao_atingido[x][z])
+            {
+                DesenhaLadrilho(DarkSlateBlue, SteelBlue, borda);
+            }
             glTranslated(0, 0, 1);
         }
         glPopMatrix();
@@ -471,6 +476,74 @@ void DesenhaMuro()
         glTranslated(1, 0, 0);
     }
     glPopMatrix();
+}
+
+void colisaoChao()
+{
+    if (tiro.z < 50 && tiro.z > 0)
+    {
+        if (tiro.x < 25 && tiro.x > 0)
+        {
+            if (tiro.y < 0.5 && tiro.y > -0.5)
+            {
+                int posMatrizX = (int)tiro.x;
+                bool quebrou = false;
+
+                vector<int> posicoesX;
+                posicoesX.push_back(posMatrizX);
+                if (posMatrizX > 0) // se nao for extremidade esquerda
+                    posicoesX.push_back(posMatrizX - 1);
+                if (posMatrizX < 24) // se nao for extremidade direita
+                    posicoesX.push_back(posMatrizX + 1);
+
+                int posMatrizZ = abs((int)tiro.z);
+                vector<int> posicoesZ;
+                posicoesZ.push_back(posMatrizZ);
+                if (posMatrizZ > 0) // se nao for extremidade emcima (matriz em cima é 0)
+                    posicoesZ.push_back(posMatrizZ - 1);
+                if (posMatrizZ < 50) // se nao for extremidade abaixo (matriz embaixo é 14)
+                    posicoesZ.push_back(posMatrizZ + 1);
+
+                for (int i = 0; i < posicoesX.size(); i++)
+                {
+                    for (int j = 0; j < posicoesZ.size(); j++)
+                    {
+                        if (!chao_atingido[posicoesX[i]][posicoesZ[j]])
+                        {
+                            atirou = false;
+                            jornada = 0.0;
+                            quebrou = true;
+                        }
+                        chao_atingido[posicoesX[i]][posicoesZ[j]] = true;
+                        printf("chao_atingido[%d][%d] = %d\n", posicoesX[i], posicoesZ[j], chao_atingido[posicoesX[i]][posicoesZ[j]]);
+                    }
+                }
+
+                if (quebrou)
+                {
+                    printf("CHAO ATINGIDO\n");
+                    printf("-5 pontos\n");
+                    pontuacao -= 5;
+                    printf("Pontuação atual: %d\n\n", pontuacao);
+                }
+            }
+        }
+    }
+}
+
+bool PodePassarChao()
+{
+    for (int i = 0; i < 25; i++)
+    {
+        for (int j = 0; j < 50; j++)
+        {
+            if (!chao_atingido[i][j])
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void ColisaoMuro()
@@ -618,12 +691,12 @@ void PosicUser()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    gluLookAt(posCannon.x, posCannon.y + 3, posCannon.z + 5,
-              posCannon.x, posCannon.y + 3, posCannon.z, // Posi��o do Alvo
-              0.0f, 1.0f, 0.0f);                         // comentar esse dps, e deixar o de baixo!!!
-    // gluLookAt(13, 6, 55,
-    //           13, 1, 10,
-    //           0.0f, 1.0f, 0.0f);
+    // gluLookAt(posCannon.x, posCannon.y + 3, posCannon.z + 5,
+    //           posCannon.x, posCannon.y + 3, posCannon.z, // Posi��o do Alvo
+    //           0.0f, 1.0f, 0.0f);                         // comentar esse dps, e deixar o de baixo!!!
+    gluLookAt(13, 6, 55,
+              13, 1, 10,
+              0.0f, 1.0f, 0.0f);
 }
 // **********************************************************************
 //  void reshape( int w, int h )
@@ -694,6 +767,7 @@ void display(void)
     if (atirou)
     {
         ColisaoMuro();
+        colisaoChao();
         if (ColisaoCanhao())
         {
             printf("GAME OVER\n");
@@ -752,15 +826,21 @@ void keyboard(unsigned char key, int x, int y)
         borda = !borda;
         break;
     case 'd':
-        if (posCannon.x < 24.8f)
-            posCannon.x += 0.150f;
+        if (PodePassarChao())
+        {
+            if (posCannon.x < 24.8f)
+                posCannon.x += 0.150f;
+        }
         break;
     case 'a':
-        if (posCannon.x > 0.2f)
-            posCannon.x -= 0.150f;
+        if (PodePassarChao())
+        {
+            if (posCannon.x > 0.2f)
+                posCannon.x -= 0.150f;
+        }
         break;
     case 'w':
-        if (PodePassar("diminuir"))
+        if (PodePassar("diminuir") and PodePassarChao())
         {
             if (posCannon.z > 0.5f)
             {
@@ -769,7 +849,7 @@ void keyboard(unsigned char key, int x, int y)
         }
         break;
     case 's':
-        if (PodePassar("aumentar"))
+        if (PodePassar("aumentar") and PodePassarChao())
         {
             if (posCannon.z < 48.5f)
             {
