@@ -269,7 +269,7 @@ bool ChecaColisaoDog(Ponto tiro)
                             printf("+10 pontos\n");
                             pontuacao += 10;
                             inimigosVivos -= 1;
-                            printf("Inimigos vivos: %d\n\n", inimigosVivos);
+                            // printf("Inimigos vivos: %d\n\n", inimigosVivos);
                         }
                         else
                         {
@@ -357,10 +357,18 @@ void DesenhaCanhao(float cannonAngle, float cannonBodyAngle)
     limitesCanhao.push_back(posCannon.z + 1.7f);
 }
 
-bool PodePassar()
+bool PodePassar(string opcao)
 {
-    if (posCannon.z == 27.25f || posCannon.z == 23.5f) // nao ta no muro
-    {
+    if (((int)posCannon.z) == 27 || ((int)posCannon.z) == 23) // nao ta no muro
+    {   
+        // se estiver voltando = ou seja, diminuir o maior numero de opcao, e quiser aumentar = pode
+                                        // ou aumentar o menor numero de opcao, e quiser diminuir = pode
+        if (opcao == "aumentar" && ((int)posCannon.z) == 27) {
+            return true;
+        } else if (opcao == "diminuir" && ((int)posCannon.z) == 23) {
+            return true;
+        }
+    
         int posMatrizX = (int)posCannon.x;
 
         vector<int> posicoesX;
@@ -380,6 +388,8 @@ bool PodePassar()
             podePassar = podePassar && muro_atingido[posicoesX[i]][14]; // de baixo
         }
         return podePassar;
+        
+
     }
     return true;
 }
@@ -750,7 +760,7 @@ void keyboard(unsigned char key, int x, int y)
             posCannon.x -= 0.150f;
         break;
     case 'w':
-        if (PodePassar())
+        if (PodePassar("diminuir"))
         {
             if (posCannon.z > 0.5f)
             {
@@ -759,7 +769,7 @@ void keyboard(unsigned char key, int x, int y)
         }
         break;
     case 's':
-        if (PodePassar())
+        if (PodePassar("aumentar"))
         {
             if (posCannon.z < 48.5f)
             {
