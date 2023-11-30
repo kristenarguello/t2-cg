@@ -139,9 +139,6 @@ void animate()
     }
     if (TempoTotal > 5.0)
     {
-        cout << "Tempo Acumulado: " << TempoTotal << " segundos. ";
-        cout << "Nros de Frames sem desenho: " << nFrames << endl;
-        cout << "FPS(sem desenho): " << nFrames / TempoTotal << endl;
         TempoTotal = 0;
         nFrames = 0;
     }
@@ -217,9 +214,15 @@ void CalculaTrajetoriaTiro()
     Ponto sentidoAponta = Ponto(0, 0, -1);
     sentidoAponta.rotacionaX(cannonAngle);
     sentidoAponta.rotacionaY(cannonBodyAngle);
+
     exatoCanhao = posCannon + Ponto(0, 0.5f, -0.4f);
-    topoTrajetoria = exatoCanhao + (sentidoAponta * forcaTiro) * 0.6 * forcaTiro;
-    fimTrajetoria = topoTrajetoria + (sentidoAponta * forcaTiro) * forcaTiro;
+    exatoCanhao.imprime();
+    // Ponto exatoCanhao = Ponto(posCannon.x, posCannon.y, posCannon.z - 3.5f);
+    // exatoCanhao.imprime();
+    // glTranslatef(0, 0.5, -0.4);
+
+    topoTrajetoria = exatoCanhao + (sentidoAponta * forcaTiro) * 0.95 * forcaTiro;
+    fimTrajetoria = topoTrajetoria + (sentidoAponta * forcaTiro) * forcaTiro; // ta igual ao de cima
     fimTrajetoria.y = -10;
 }
 
@@ -438,42 +441,50 @@ void ColisaoMuro()
 {
     // tiro.imprime();
     // printf("\n%f", tiro.z);
-    if (tiro.z < 27.25f && tiro.z > 26.25f)
-    {
-        int posMatrizX = (int)tiro.x;
+    if (tiro.z < 27.25f && tiro.z > 26.25f) {
+        if (tiro.x < 25 && tiro.x > 0) {
+            if (tiro.y < 15 && tiro.y > 0) {
+                int posMatrizX = (int)tiro.x;
 
-        vector<int> posicoesX;
-        posicoesX.push_back(posMatrizX);
-        if (posMatrizX > 0) // se nao for extremidade esquerda
-            posicoesX.push_back(posMatrizX - 1);
-        if (posMatrizX < 24) // se nao for extremidade direita
-            posicoesX.push_back(posMatrizX + 1);
+                vector<int> posicoesX;
+                posicoesX.push_back(posMatrizX);
+                if (posMatrizX > 0) // se nao for extremidade esquerda
+                    posicoesX.push_back(posMatrizX - 1);
+                if (posMatrizX < 24) // se nao for extremidade direita
+                    posicoesX.push_back(posMatrizX + 1);
 
-        int posMatrizY = abs((int)tiro.y - 14);
-        vector<int> posicoesY;
-        posicoesY.push_back(posMatrizY);
-        if (posMatrizY > 0) // se nao for extremidade emcima (matriz em cima é 0)
-            posicoesY.push_back(posMatrizY - 1);
-        if (posMatrizY < 14) // se nao for extremidade abaixo (matriz embaixo é 14)
-            posicoesY.push_back(posMatrizY + 1);
+                int posMatrizY = abs((int)tiro.y - 14);
+                vector<int> posicoesY;
+                posicoesY.push_back(posMatrizY);
+                if (posMatrizY > 0) // se nao for extremidade emcima (matriz em cima é 0)
+                    posicoesY.push_back(posMatrizY - 1);
+                if (posMatrizY < 14) // se nao for extremidade abaixo (matriz embaixo é 14)
+                    posicoesY.push_back(posMatrizY + 1);
 
-        for (int i = 0; i < posicoesX.size(); i++)
-        {
-            for (int j = 0; j < posicoesY.size(); j++)
-            {
-                if (!muro_atingido[posicoesX[i]][posicoesY[j]])
+                for (int i = 0; i < posicoesX.size(); i++)
                 {
                     printf("TIRO ACERTOU MURO\n");
                     printf("+5 pontos\n");
-                    pontuacao += 5;
-                    atirou = false;
-                    jornada = 0.0;
+    
+                    for (int j = 0; j < posicoesY.size(); j++)
+                    {
+                        if (!muro_atingido[posicoesX[i]][posicoesY[j]])
+                        {
+                            atirou = false;
+                            jornada = 0.0;
+                            pontuacao += 5;
+                        } else 
+                            muro_atingido[posicoesX[i]][posicoesY[j]] = true;
+                    }
                 }
-
-                muro_atingido[posicoesX[i]][posicoesY[j]] = true;
             }
         }
     }
+}
+
+
+bool ColisaoCanhao() {
+    
 }
 
 // **********************************************************************
@@ -554,12 +565,12 @@ void PosicUser()
     // gluLookAt(-7, 5, 45, // Posi��o do Observador
     //           -7, 0, 0,  // Posi��o do Alvo
     //           0.0f, 1.0f, 0.0f);
-    gluLookAt(posCannon.x, posCannon.y + 3, posCannon.z + 5,
-              posCannon.x, posCannon.y + 3, posCannon.z, // Posi��o do Alvo
-              0.0f, 1.0f, 0.0f);                         // comentar esse dps, e deixar o de baixo!!!
-    // gluLookAt(13, 6, 55,
-    //         13, 1, 10,
-    //         0.0f, 1.0f, 0.0f);
+    // gluLookAt(posCannon.x, posCannon.y + 3, posCannon.z + 5,
+    //           posCannon.x, posCannon.y + 3, posCannon.z, // Posi��o do Alvo
+    //           0.0f, 1.0f, 0.0f);                         // comentar esse dps, e deixar o de baixo!!!
+    gluLookAt(13, 6, 55,
+            13, 1, 10,
+            0.0f, 1.0f, 0.0f);
 
     // gluLookAt(-12, 30 , 15 , -7,0,0, 0,1,0);
 
@@ -653,6 +664,7 @@ void display(void)
     {
         ColisaoMuro();
     }
+    
 
     glutSwapBuffers();
 }
@@ -674,7 +686,7 @@ void keyboard(unsigned char key, int x, int y)
         glutPostRedisplay();
         break;
     case 'e':
-        printf("\nA velocidade do tiro é: %f\n", forcaTiro);
+        printf("\nA intensidade do tiro é: %f\n", forcaTiro);
         if (!atirou)
         {
             if (forcaTiro < 6)
@@ -684,7 +696,7 @@ void keyboard(unsigned char key, int x, int y)
         }
         break;
     case 'q':
-        printf("\nA velocidade do tiro é: %f\n", forcaTiro);
+        printf("\nA intensidade do tiro é: %f\n", forcaTiro);
         if (!atirou)
         {
             if (forcaTiro > 1)
@@ -781,7 +793,9 @@ void arrow_keys(int a_keys, int x, int y)
         break;
     case GLUT_KEY_RIGHT:
         // if (cannonBodyAngle - 3 > -45.0)
+        posCannon.imprime();
         cannonBodyAngle -= 3;
+        printf("%f\n", cannonBodyAngle);
         break;
     case GLUT_KEY_LEFT:
         // if (cannonBodyAngle + 3 < 45.0)
