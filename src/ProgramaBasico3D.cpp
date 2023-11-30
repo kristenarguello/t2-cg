@@ -63,7 +63,7 @@ float variaPosX = -4.0f;
 float cannonAngle = 0;
 float cannonBodyAngle = 0;
 Ponto posCannon = Ponto(13, 1, 45.0f);
-Ponto tiro = Ponto(-100,0,-10);
+Ponto tiro = Ponto(-100, 0, -10);
 
 float forcaTiro = 2;
 
@@ -305,7 +305,6 @@ void DesenhaTiro()
             atirou = false;
             return;
         }
-
         DesenhaBolaCanhao(tiro, 0.3);
         tiro = calculaCurva(exatoCanhao, topoTrajetoria, fimTrajetoria, jornada);
         DesenhaBolaCanhao(tiro, 0.3);
@@ -443,34 +442,43 @@ void DesenhaMuro()
     glPopMatrix();
 }
 
-void ColisaoMuro() {
+void ColisaoMuro()
+{
     // tiro.imprime();
     // printf("\n%f", tiro.z);
-        if (tiro.z < 27.25f && tiro.z > 26.25f) {
-            int posMatrizX = (int)tiro.x;
+    if (tiro.z < 27.25f && tiro.z > 26.25f)
+    {
+        int posMatrizX = (int)tiro.x;
 
-            vector<int> posicoesX;
-            posicoesX.push_back(posMatrizX);
-            if (posMatrizX > 0) // se nao for extremidade esquerda
-                posicoesX.push_back(posMatrizX - 1);
-            if (posMatrizX < 24) // se nao for extremidade direita
-                posicoesX.push_back(posMatrizX + 1);
-            
-            int posMatrizY = abs((int)tiro.y - 14);
-            vector<int> posicoesY;
-            posicoesY.push_back(posMatrizY);
-            if (posMatrizY > 0) // se nao for extremidade emcima (matriz em cima é 0)
-                posicoesY.push_back(posMatrizY - 1); 
-            if (posMatrizY < 14) // se nao for extremidade abaixo (matriz embaixo é 14) 
-                posicoesY.push_back(posMatrizY + 1);
-            
-            for (int i = 0; i < posicoesX.size(); i++) {
-                for (int j = 0; j < posicoesY.size(); j++) {
-                    muro_atingido[posicoesX[i]][posicoesY[j]] = true;
+        vector<int> posicoesX;
+        posicoesX.push_back(posMatrizX);
+        if (posMatrizX > 0) // se nao for extremidade esquerda
+            posicoesX.push_back(posMatrizX - 1);
+        if (posMatrizX < 24) // se nao for extremidade direita
+            posicoesX.push_back(posMatrizX + 1);
+
+        int posMatrizY = abs((int)tiro.y - 14);
+        vector<int> posicoesY;
+        posicoesY.push_back(posMatrizY);
+        if (posMatrizY > 0) // se nao for extremidade emcima (matriz em cima é 0)
+            posicoesY.push_back(posMatrizY - 1);
+        if (posMatrizY < 14) // se nao for extremidade abaixo (matriz embaixo é 14)
+            posicoesY.push_back(posMatrizY + 1);
+
+        for (int i = 0; i < posicoesX.size(); i++)
+        {
+            for (int j = 0; j < posicoesY.size(); j++)
+            {
+                if (!muro_atingido[posicoesX[i]][posicoesY[j]])
+                {
+                    atirou = false;
+                    jornada = 0.0;
                 }
+
+                muro_atingido[posicoesX[i]][posicoesY[j]] = true;
             }
         }
-     
+    }
 }
 
 // **********************************************************************
@@ -646,7 +654,8 @@ void display(void)
         }
     }
     DesenhaTiro();
-    if (atirou) {
+    if (atirou)
+    {
         ColisaoMuro();
     }
 
