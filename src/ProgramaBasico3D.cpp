@@ -70,7 +70,7 @@ Ponto tiro = Ponto(-100, 0, -10);
 float forcaTiro = 4;
 
 bool muro_atingido[25][15];
-vector<int> limitesCanhao; 
+vector<int> limitesCanhao;
 
 #define inimigos 20
 Objeto3D dog;
@@ -88,7 +88,7 @@ int inimigosVivos;
 //        Inicializa os parametros globais de OpenGL
 // **********************************************************************
 void init(void)
-{   
+{
     inimigosVivos = 0;
     glClearColor(1.0f, 1.0f, 0.0f, 1.0f); // Fundo de tela preto
 
@@ -113,15 +113,16 @@ void init(void)
     for (int i = 0; i < inimigos; i++)
     {
         Dog &d = dogsList[i];
-        d.x = CantoEsquerdo.x + 2 + (rand() % 22);
+        d.x = CantoEsquerdo.x + 2 + (rand() % 19);
         d.y = CantoEsquerdo.y;
-        d.z = CantoEsquerdo.z + 2 + (rand() % 22);
-        printf("Cachorro %d: x = %.2f, y = %.2f, z = %.2f\n", i, d.x, d.y, d.z);
-        if (i % 2 == 0) {
+        d.z = CantoEsquerdo.z + 10 + (rand() % 15);
+        if (i % 2 == 0)
+        {
             d.inimigo = true;
             inimigosVivos += 1;
         }
-        else {
+        else
+        {
             d.inimigo = false;
         }
 
@@ -268,6 +269,7 @@ bool ChecaColisaoDog(Ponto tiro)
                             printf("+10 pontos\n");
                             pontuacao += 10;
                             inimigosVivos -= 1;
+                            printf("Inimigos vivos: %d\n\n", inimigosVivos);
                         }
                         else
                         {
@@ -285,8 +287,10 @@ bool ChecaColisaoDog(Ponto tiro)
     return false;
 }
 
-void ChecaSeGanhou() {
-    if (inimigosVivos == 0) {
+void ChecaSeGanhou()
+{
+    if (inimigosVivos == 0)
+    {
         printf("PARABENS, VOCE GANHOU! :)\n");
         printf("Sua pontuação total foi: %d\n", pontuacao);
         exit(0);
@@ -330,7 +334,7 @@ void DesenhaTiro()
 
 void DesenhaCanhao(float cannonAngle, float cannonBodyAngle)
 {
-    
+
     glPushMatrix();
     glColor3f(1, 1, 1);
 
@@ -351,7 +355,6 @@ void DesenhaCanhao(float cannonAngle, float cannonBodyAngle)
     limitesCanhao.push_back(posCannon.x + 1.2f);
     limitesCanhao.push_back(posCannon.z - 1.7f);
     limitesCanhao.push_back(posCannon.z + 1.7f);
-
 }
 
 bool PodePassar()
@@ -462,9 +465,12 @@ void DesenhaMuro()
 
 void ColisaoMuro()
 {
-    if (tiro.z < 27 && tiro.z > 26) {
-        if (tiro.x < 25 && tiro.x > 0) {
-            if (tiro.y < 15 && tiro.y > 0) {
+    if (tiro.z < 27.5 && tiro.z > 25.5)
+    {
+        if (tiro.x < 25 && tiro.x > 0)
+        {
+            if (tiro.y < 15 && tiro.y > 0)
+            {
                 int posMatrizX = (int)tiro.x;
                 bool quebrou = false;
 
@@ -492,12 +498,13 @@ void ColisaoMuro()
                             atirou = false;
                             jornada = 0.0;
                             quebrou = true;
-                        }  
+                        }
                         muro_atingido[posicoesX[i]][posicoesY[j]] = true;
                     }
                 }
 
-                if (quebrou) {
+                if (quebrou)
+                {
                     printf("MURO ATINGIDO\n");
                     printf("+5 pontos\n");
                     pontuacao += 5;
@@ -508,11 +515,15 @@ void ColisaoMuro()
     }
 }
 
-//limitesCanhao
-bool ColisaoCanhao() {
-    if (tiro.y < 0.35f) {
-        if (tiro.x >= limitesCanhao[0] && tiro.x <= limitesCanhao[1]) {
-            if (tiro.z >= limitesCanhao[2] && tiro.z <= limitesCanhao[3]) {
+// limitesCanhao
+bool ColisaoCanhao()
+{
+    if (tiro.y < 0.35f)
+    {
+        if (tiro.x >= limitesCanhao[0] && tiro.x <= limitesCanhao[1])
+        {
+            if (tiro.z >= limitesCanhao[2] && tiro.z <= limitesCanhao[3])
+            {
                 // printf("tiro acertou o canhao\n");
                 // tiro.imprime();
                 return true;
@@ -597,13 +608,12 @@ void PosicUser()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    gluLookAt(posCannon.x, posCannon.y + 3, posCannon.z + 5,
-              posCannon.x, posCannon.y + 3, posCannon.z, // Posi��o do Alvo
-              0.0f, 1.0f, 0.0f);                         // comentar esse dps, e deixar o de baixo!!!
-    // gluLookAt(13, 6, 55,
-    //         13, 1, 10,
-    //         0.0f, 1.0f, 0.0f);
-
+    // gluLookAt(posCannon.x, posCannon.y + 3, posCannon.z + 5,
+    //           posCannon.x, posCannon.y + 3, posCannon.z, // Posi��o do Alvo
+    //           0.0f, 1.0f, 0.0f);                         // comentar esse dps, e deixar o de baixo!!!
+    gluLookAt(13, 6, 55,
+              13, 1, 10,
+              0.0f, 1.0f, 0.0f);
 }
 // **********************************************************************
 //  void reshape( int w, int h )
@@ -683,7 +693,6 @@ void display(void)
         }
     }
     ChecaSeGanhou();
-    
 
     glutSwapBuffers();
 }
