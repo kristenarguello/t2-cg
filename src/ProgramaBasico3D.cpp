@@ -64,14 +64,13 @@ float variaPosX = -4.0f;
 
 float cannonAngle = 0;
 float cannonBodyAngle = 0;
-Ponto posCannon = Ponto(13, 1, 45.0f);
+Ponto posCannon = Ponto(13, 0, 45.0f);
 Ponto tiro = Ponto(-100, 0, -10);
 
-float forcaTiro = 2;
+float forcaTiro = 4;
 
 bool muro_atingido[25][15];
-// vector<bool> linha
-//  vector<int> v1(10,-1);
+vector<int> limitesCanhao; 
 
 #define inimigos 20
 Objeto3D dog;
@@ -81,14 +80,16 @@ struct Dog
     bool inimigo, vivo;
 };
 Dog *dogsList;
-// Ponto miniCannon = Ponto(posCannon.x + 5, posCannon.y - 2, posCannon.z + 2);
+
+int inimigosVivos;
 
 // **********************************************************************
 //  void init(void)
 //        Inicializa os parametros globais de OpenGL
 // **********************************************************************
 void init(void)
-{
+{   
+    inimigosVivos = 0;
     glClearColor(1.0f, 1.0f, 0.0f, 1.0f); // Fundo de tela preto
 
     glClearDepth(1.0);
@@ -115,7 +116,15 @@ void init(void)
         d.x = CantoEsquerdo.x + 2 + (rand() % 22);
         d.y = CantoEsquerdo.y;
         d.z = CantoEsquerdo.z + 2 + (rand() % 22);
-        d.inimigo = i % 2 == 0;
+        printf("Cachorro %d: x = %.2f, y = %.2f, z = %.2f\n", i, d.x, d.y, d.z);
+        if (i % 2 == 0) {
+            d.inimigo = true;
+            inimigosVivos += 1;
+        }
+        else {
+            d.inimigo = false;
+        }
+
         d.vivo = true;
     }
 }
@@ -215,6 +224,7 @@ void CalculaTrajetoriaTiro()
     sentidoAponta.rotacionaX(cannonAngle);
     sentidoAponta.rotacionaY(cannonBodyAngle);
     exatoCanhao = posCannon + Ponto(0, 0.5f, -0.4f);
+
     topoTrajetoria = exatoCanhao + (sentidoAponta * forcaTiro) * 0.95 * forcaTiro;
     fimTrajetoria = topoTrajetoria + (sentidoAponta * forcaTiro) * forcaTiro; // ta igual ao de cima
     fimTrajetoria.y = -10;
@@ -250,20 +260,23 @@ bool ChecaColisaoDog(Ponto tiro)
                 {
                     if (d.z - 1 < tiro.z && tiro.z < d.z + 1)
                     {
-                        printf("TIRO ACERTOU\n");
+                        printf("TIRO ACERTOU UM ");
                         d.vivo = false;
                         if (d.inimigo)
                         {
+                            printf("INIMIGO!\n");
                             printf("+10 pontos\n");
                             pontuacao += 10;
-                            return true;
+                            inimigosVivos -= 1;
                         }
                         else
                         {
+                            printf("AMIGO!\n");
                             printf("-10 pontos\n");
                             pontuacao -= 10;
-                            return true;
                         }
+                        printf("Pontuação atual: %d\n\n", pontuacao);
+                        return true;
                     }
                 }
             }
@@ -272,11 +285,19 @@ bool ChecaColisaoDog(Ponto tiro)
     return false;
 }
 
+void ChecaSeGanhou() {
+    if (inimigosVivos == 0) {
+        printf("PARABENS, VOCE GANHOU! :)\n");
+        printf("Sua pontuação total foi: %d\n", pontuacao);
+        exit(0);
+    }
+}
+
 bool atirou = false;
 float jornada = 0.0;
 void DesenhaTiro()
 {
-    if (atirou && forcaTiro > 0.0f)
+    if (atirou && forcaTiro > 2.0f)
     {
         tiro = calculaCurva(exatoCanhao, topoTrajetoria, fimTrajetoria, jornada);
         if (tiro.y < -3.0f)
@@ -284,8 +305,9 @@ void DesenhaTiro()
             jornada = 0.0;
             atirou = false;
             printf("TIRO CAIU\n");
-            printf("-5 ponto\n");
+            printf("-5 pontos\n");
             pontuacao -= 5;
+            printf("Pontuação atual: %d\n\n", pontuacao);
             return;
         }
         if (ChecaColisaoDog(tiro))
@@ -308,6 +330,7 @@ void DesenhaTiro()
 
 void DesenhaCanhao(float cannonAngle, float cannonBodyAngle)
 {
+    
     glPushMatrix();
     glColor3f(1, 1, 1);
 
@@ -316,13 +339,19 @@ void DesenhaCanhao(float cannonAngle, float cannonBodyAngle)
     glScalef(2, 1, 3);
     glutSolidCube(1);
 
-    // printf("%f\n", miniCannon.x);
     glColor3f(0, 0.25f, 0.65f);
-    glTranslatef(0, 0.5, -0.4);
+    glTranslatef(0, 0.5f, -0.4f);
     glRotatef(cannonAngle, 1, 0, 0);
     glScalef(0.3f, 0.3f, 0.7f);
     glutSolidCube(1);
     glPopMatrix();
+
+    limitesCanhao.clear();
+    limitesCanhao.push_back(posCannon.x - 1.2f);
+    limitesCanhao.push_back(posCannon.x + 1.2f);
+    limitesCanhao.push_back(posCannon.z - 1.7f);
+    limitesCanhao.push_back(posCannon.z + 1.7f);
+
 }
 
 bool PodePassar()
@@ -433,15 +462,11 @@ void DesenhaMuro()
 
 void ColisaoMuro()
 {
-    // tiro.imprime();
-    // printf("\n%f", tiro.z);
-    if (tiro.z < 27.25f && tiro.z > 26.25f)
-    {
-        if (tiro.x < 25 && tiro.x > 0)
-        {
-            if (tiro.y < 15 && tiro.y > 0)
-            {
+    if (tiro.z < 27 && tiro.z > 26) {
+        if (tiro.x < 25 && tiro.x > 0) {
+            if (tiro.y < 15 && tiro.y > 0) {
                 int posMatrizX = (int)tiro.x;
+                bool quebrou = false;
 
                 vector<int> posicoesX;
                 posicoesX.push_back(posMatrizX);
@@ -460,29 +485,42 @@ void ColisaoMuro()
 
                 for (int i = 0; i < posicoesX.size(); i++)
                 {
-                    printf("TIRO ACERTOU MURO\n");
-                    printf("+5 pontos\n");
-
                     for (int j = 0; j < posicoesY.size(); j++)
                     {
                         if (!muro_atingido[posicoesX[i]][posicoesY[j]])
                         {
                             atirou = false;
                             jornada = 0.0;
-                            pontuacao += 5;
-                        }
-
+                            quebrou = true;
+                        }  
                         muro_atingido[posicoesX[i]][posicoesY[j]] = true;
                     }
+                }
+
+                if (quebrou) {
+                    printf("MURO ATINGIDO\n");
+                    printf("+5 pontos\n");
+                    pontuacao += 5;
+                    printf("Pontuação atual: %d\n\n", pontuacao);
                 }
             }
         }
     }
 }
 
-// bool ColisaoCanhao() {
-
-// }
+//limitesCanhao
+bool ColisaoCanhao() {
+    if (tiro.y < 0.35f) {
+        if (tiro.x >= limitesCanhao[0] && tiro.x <= limitesCanhao[1]) {
+            if (tiro.z >= limitesCanhao[2] && tiro.z <= limitesCanhao[3]) {
+                // printf("tiro acertou o canhao\n");
+                // tiro.imprime();
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 // **********************************************************************
 //  void DefineLuz(void)
@@ -558,20 +596,14 @@ void PosicUser()
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    // -20, -1 ,-10
-    // gluLookAt(-7, 5, 45, // Posi��o do Observador
-    //           -7, 0, 0,  // Posi��o do Alvo
-    //           0.0f, 1.0f, 0.0f);
-    // gluLookAt(posCannon.x, posCannon.y + 3, posCannon.z + 5,
-    //           posCannon.x, posCannon.y + 3, posCannon.z, // Posi��o do Alvo
-    //           0.0f, 1.0f, 0.0f);                         // comentar esse dps, e deixar o de baixo!!!
-    gluLookAt(13, 6, 55,
-              13, 1, 10,
-              0.0f, 1.0f, 0.0f);
 
-    // gluLookAt(-12, 30 , 15 , -7,0,0, 0,1,0);
+    gluLookAt(posCannon.x, posCannon.y + 3, posCannon.z + 5,
+              posCannon.x, posCannon.y + 3, posCannon.z, // Posi��o do Alvo
+              0.0f, 1.0f, 0.0f);                         // comentar esse dps, e deixar o de baixo!!!
+    // gluLookAt(13, 6, 55,
+    //         13, 1, 10,
+    //         0.0f, 1.0f, 0.0f);
 
-    // Ponto CantoEsquerdo = Ponto(-20, -1, -10);
 }
 // **********************************************************************
 //  void reshape( int w, int h )
@@ -612,25 +644,8 @@ void display(void)
 
     glMatrixMode(GL_MODELVIEW);
 
-    // glPushMatrix();
-    // glTranslatef(5.0f, 0.0f, 3.0f);
-    // glRotatef(angulo, 0, 1, 0);
-    // glColor3f(0.5f, 0.0f, 0.0f); // Vermelho
-    // glutSolidCube(2);
-    // // DesenhaCubo(1);
-    // glPopMatrix();
-
-    // glPushMatrix();
-    // glTranslatef(variaPosX, 0.0f, 2.0f);
-    // glRotatef(angulo, 0, 1, 0);
-    // glColor3f(0.6156862745, 0.8980392157, 0.9803921569); // Azul claro
-    // glutSolidCube(2);
-    // // DesenhaCubo(1);
-    // glPopMatrix();
-
     glPushMatrix();
     DesenhaPiso();
-    //-20, -1, -10
     glTranslatef(0, 14.5f, 25.5f);
     DesenhaMuro();
     glPopMatrix();
@@ -642,13 +657,12 @@ void display(void)
         Dog &d = dogsList[i];
         if (d.vivo)
         {
-            // printf("Dog(%.2f, %.2f, %.2f)\n", d.x, d.y, d.z);
             glPushMatrix();
             glTranslatef(d.x, d.y, d.z);
             glRotatef(-90, 0, 1, 0);
             glScalef(0.2, 0.2, 0.2);
             if (d.inimigo)
-                glColor3f(1.0f, 0.0f, 0.0f); // mudar, mto parecido com o deles
+                glColor3f(1.0f, 0.0f, 0.0f);
             else
                 glColor3f(0.0f, 1.0f, 0.0f);
 
@@ -660,7 +674,16 @@ void display(void)
     if (atirou)
     {
         ColisaoMuro();
+        if (ColisaoCanhao())
+        {
+            printf("GAME OVER\n");
+            printf("Você explodiu o seu veículo! :(\n");
+            printf("Sua pontuação total foi: %d\n", pontuacao);
+            exit(0);
+        }
     }
+    ChecaSeGanhou();
+    
 
     glutSwapBuffers();
 }
@@ -682,7 +705,6 @@ void keyboard(unsigned char key, int x, int y)
         glutPostRedisplay();
         break;
     case 'e':
-        printf("\nA intensidade do tiro é: %f\n", forcaTiro);
         if (!atirou)
         {
             if (forcaTiro < 6)
@@ -690,16 +712,17 @@ void keyboard(unsigned char key, int x, int y)
                 forcaTiro += 1;
             }
         }
+        printf("\nA intensidade atual do tiro é: %.1f\n", forcaTiro);
         break;
     case 'q':
-        printf("\nA intensidade do tiro é: %f\n", forcaTiro);
         if (!atirou)
         {
-            if (forcaTiro > 1)
+            if (forcaTiro > 4)
             {
                 forcaTiro -= 1;
             }
         }
+        printf("\nA intensidade do tiro é: %.1f\n", forcaTiro);
         break;
     case 'l':
         ModoDeExibicao = !ModoDeExibicao;
@@ -710,18 +733,14 @@ void keyboard(unsigned char key, int x, int y)
         borda = !borda;
         break;
     case 'd':
-        // printf("\n%f", posCannon.x);
         if (posCannon.x < 24.8f)
             posCannon.x += 0.150f;
         break;
     case 'a':
-        // printf("\n%f", posCannon.x);
-        if (posCannon.x > 0.25f)
+        if (posCannon.x > 0.2f)
             posCannon.x -= 0.150f;
         break;
     case 'w':
-        // variaY++;
-        // printf("\n%f",posCannon.z);
         if (PodePassar())
         {
             if (posCannon.z > 0.5f)
@@ -731,8 +750,6 @@ void keyboard(unsigned char key, int x, int y)
         }
         break;
     case 's':
-        // variaY--;
-        // printf("\n%f",posCannon.z);
         if (PodePassar())
         {
             if (posCannon.z < 48.5f)
@@ -746,17 +763,7 @@ void keyboard(unsigned char key, int x, int y)
         break;
     case ' ':
         CalculaTrajetoriaTiro();
-        // muro_atingido[3][13] = true;
-        // muro_atingido[3][14] = true;
-
-        // muro_atingido[2][13] = true;
-        // muro_atingido[2][14] = true;
-
-        // muro_atingido[4][13] = true;
-        // muro_atingido[4][14] = true;
-        // posCannon.imprime();
-        // printf("TIRO\n");
-        if (forcaTiro > 0.0f)
+        if (forcaTiro > 3)
             atirou = true;
         break;
     default:
@@ -775,26 +782,15 @@ void arrow_keys(int a_keys, int x, int y)
     switch (a_keys)
     {
     case GLUT_KEY_UP: // When Up Arrow Is Pressed...
-                      // glutFullScreen(); // Go Into Full Screen Mode
-                      // if (cannonAngle < 45)
         cannonAngle += 3;
-
         break;
     case GLUT_KEY_DOWN: // When Down Arrow Is Pressed...
-                        // glutInitWindowSize(700, 500);
-                        // if (cannonAngle >  )
-                        // printf("%f\n", cannonAngle);
-                        // if (cannonAngle > 0)
         cannonAngle -= 3;
         break;
     case GLUT_KEY_RIGHT:
-        // if (cannonBodyAngle - 3 > -45.0)
-        posCannon.imprime();
         cannonBodyAngle -= 3;
-        printf("%f\n", cannonBodyAngle);
         break;
     case GLUT_KEY_LEFT:
-        // if (cannonBodyAngle + 3 < 45.0)
         cannonBodyAngle += 3;
         break;
     default:
