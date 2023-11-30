@@ -37,6 +37,8 @@ using namespace std;
 #include "Ponto.h"
 Temporizador T;
 double AccumDeltaT = 0;
+int pontuacao = 0;
+bool gameOver = false;
 
 GLfloat AspectRatio, angulo = 0;
 
@@ -215,23 +217,10 @@ void CalculaTrajetoriaTiro()
     Ponto sentidoAponta = Ponto(0, 0, -1);
     sentidoAponta.rotacionaX(cannonAngle);
     sentidoAponta.rotacionaY(cannonBodyAngle);
-
-    float norm = sqrt(pow(sentidoAponta.x, 2) + pow(sentidoAponta.y, 2) + pow(sentidoAponta.z, 2));
-    if (norm != 0.0)
-    {
-        sentidoAponta.x /= norm;
-        sentidoAponta.y /= norm;
-        sentidoAponta.z /= norm;
-    }
     exatoCanhao = posCannon + Ponto(0, 0.5f, -0.4f);
-    // Ponto exatoCanhao = Ponto(posCannon.x, posCannon.y + 0.5f, posCannon.z - 0.4f);
     topoTrajetoria = exatoCanhao + (sentidoAponta * forcaTiro) * 0.6 * forcaTiro;
-    fimTrajetoria = topoTrajetoria + (sentidoAponta * forcaTiro) * forcaTiro; // ta igual ao de cima
+    fimTrajetoria = topoTrajetoria + (sentidoAponta * forcaTiro) * forcaTiro;
     fimTrajetoria.y = -10;
-
-    // esse calculo nao ta levando em consideracao o angulo do canhao estar pra tras
-
-    // alem de que nao ta pronto!!!
 }
 
 void DesenhaBolaCanhao(Ponto p, float raio)
@@ -269,11 +258,13 @@ bool ChecaColisaoDog(Ponto tiro)
                         if (d.inimigo)
                         {
                             printf("+10 pontos\n");
+                            pontuacao += 10;
                             return true;
                         }
                         else
                         {
                             printf("-10 pontos\n");
+                            pontuacao -= 10;
                             return true;
                         }
                     }
@@ -297,6 +288,7 @@ void DesenhaTiro()
             atirou = false;
             printf("TIRO CAIU\n");
             printf("-5 ponto\n");
+            pontuacao -= 5;
             return;
         }
         if (ChecaColisaoDog(tiro))
@@ -471,6 +463,9 @@ void ColisaoMuro()
             {
                 if (!muro_atingido[posicoesX[i]][posicoesY[j]])
                 {
+                    printf("TIRO ACERTOU MURO\n");
+                    printf("+5 pontos\n");
+                    pontuacao += 5;
                     atirou = false;
                     jornada = 0.0;
                 }
