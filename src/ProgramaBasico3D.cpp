@@ -131,7 +131,7 @@ void animate()
     TempoTotal += dt;
     nFrames++;
 
-    if (AccumDeltaT > 1.0 / 30) // fixa a atualiza��o da tela em 30
+    if (AccumDeltaT > 1.0 / 25) // fixa a atualiza��o da tela em 30
     {
         AccumDeltaT = 0;
         angulo += 1;
@@ -214,13 +214,7 @@ void CalculaTrajetoriaTiro()
     Ponto sentidoAponta = Ponto(0, 0, -1);
     sentidoAponta.rotacionaX(cannonAngle);
     sentidoAponta.rotacionaY(cannonBodyAngle);
-
     exatoCanhao = posCannon + Ponto(0, 0.5f, -0.4f);
-    exatoCanhao.imprime();
-    // Ponto exatoCanhao = Ponto(posCannon.x, posCannon.y, posCannon.z - 3.5f);
-    // exatoCanhao.imprime();
-    // glTranslatef(0, 0.5, -0.4);
-
     topoTrajetoria = exatoCanhao + (sentidoAponta * forcaTiro) * 0.95 * forcaTiro;
     fimTrajetoria = topoTrajetoria + (sentidoAponta * forcaTiro) * forcaTiro; // ta igual ao de cima
     fimTrajetoria.y = -10;
@@ -441,9 +435,12 @@ void ColisaoMuro()
 {
     // tiro.imprime();
     // printf("\n%f", tiro.z);
-    if (tiro.z < 27.25f && tiro.z > 26.25f) {
-        if (tiro.x < 25 && tiro.x > 0) {
-            if (tiro.y < 15 && tiro.y > 0) {
+    if (tiro.z < 27.25f && tiro.z > 26.25f)
+    {
+        if (tiro.x < 25 && tiro.x > 0)
+        {
+            if (tiro.y < 15 && tiro.y > 0)
+            {
                 int posMatrizX = (int)tiro.x;
 
                 vector<int> posicoesX;
@@ -465,7 +462,7 @@ void ColisaoMuro()
                 {
                     printf("TIRO ACERTOU MURO\n");
                     printf("+5 pontos\n");
-    
+
                     for (int j = 0; j < posicoesY.size(); j++)
                     {
                         if (!muro_atingido[posicoesX[i]][posicoesY[j]])
@@ -473,8 +470,9 @@ void ColisaoMuro()
                             atirou = false;
                             jornada = 0.0;
                             pontuacao += 5;
-                        } else 
-                            muro_atingido[posicoesX[i]][posicoesY[j]] = true;
+                        }
+
+                        muro_atingido[posicoesX[i]][posicoesY[j]] = true;
                     }
                 }
             }
@@ -482,10 +480,9 @@ void ColisaoMuro()
     }
 }
 
+// bool ColisaoCanhao() {
 
-bool ColisaoCanhao() {
-    
-}
+// }
 
 // **********************************************************************
 //  void DefineLuz(void)
@@ -569,8 +566,8 @@ void PosicUser()
     //           posCannon.x, posCannon.y + 3, posCannon.z, // Posi��o do Alvo
     //           0.0f, 1.0f, 0.0f);                         // comentar esse dps, e deixar o de baixo!!!
     gluLookAt(13, 6, 55,
-            13, 1, 10,
-            0.0f, 1.0f, 0.0f);
+              13, 1, 10,
+              0.0f, 1.0f, 0.0f);
 
     // gluLookAt(-12, 30 , 15 , -7,0,0, 0,1,0);
 
@@ -664,7 +661,6 @@ void display(void)
     {
         ColisaoMuro();
     }
-    
 
     glutSwapBuffers();
 }
@@ -716,12 +712,12 @@ void keyboard(unsigned char key, int x, int y)
     case 'd':
         // printf("\n%f", posCannon.x);
         if (posCannon.x < 24.8f)
-            posCannon.x += 0.25;
+            posCannon.x += 0.150f;
         break;
     case 'a':
         // printf("\n%f", posCannon.x);
-        if (posCannon.x > 0.2f)
-            posCannon.x -= 0.25;
+        if (posCannon.x > 0.25f)
+            posCannon.x -= 0.150f;
         break;
     case 'w':
         // variaY++;
@@ -730,7 +726,7 @@ void keyboard(unsigned char key, int x, int y)
         {
             if (posCannon.z > 0.5f)
             {
-                posCannon.z -= 0.25f;
+                posCannon.z -= 0.150f;
             }
         }
         break;
@@ -741,7 +737,7 @@ void keyboard(unsigned char key, int x, int y)
         {
             if (posCannon.z < 48.5f)
             {
-                posCannon.z += 0.25f;
+                posCannon.z += 0.150f;
             }
         }
         break;
