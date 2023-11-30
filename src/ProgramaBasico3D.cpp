@@ -64,7 +64,7 @@ float variaPosX = -4.0f;
 
 float cannonAngle = 0;
 float cannonBodyAngle = 0;
-Ponto posCannon = Ponto(13, 0, 45.0f);
+Ponto posCannon = Ponto(13, 0.5, 45.0f);
 Ponto tiro = Ponto(-100, 0, -10);
 
 float forcaTiro = 4;
@@ -360,15 +360,18 @@ void DesenhaCanhao(float cannonAngle, float cannonBodyAngle)
 bool PodePassar(string opcao)
 {
     if (((int)posCannon.z) == 27 || ((int)posCannon.z) == 23) // nao ta no muro
-    {   
+    {
         // se estiver voltando = ou seja, diminuir o maior numero de opcao, e quiser aumentar = pode
-                                        // ou aumentar o menor numero de opcao, e quiser diminuir = pode
-        if (opcao == "aumentar" && ((int)posCannon.z) == 27) {
-            return true;
-        } else if (opcao == "diminuir" && ((int)posCannon.z) == 23) {
+        // ou aumentar o menor numero de opcao, e quiser diminuir = pode
+        if (opcao == "aumentar" && ((int)posCannon.z) == 27)
+        {
             return true;
         }
-    
+        else if (opcao == "diminuir" && ((int)posCannon.z) == 23)
+        {
+            return true;
+        }
+
         int posMatrizX = (int)posCannon.x;
 
         vector<int> posicoesX;
@@ -388,8 +391,6 @@ bool PodePassar(string opcao)
             podePassar = podePassar && muro_atingido[posicoesX[i]][14]; // de baixo
         }
         return podePassar;
-        
-
     }
     return true;
 }
@@ -618,12 +619,12 @@ void PosicUser()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    gluLookAt(posCannon.x, posCannon.y + 3, posCannon.z + 5,
-              posCannon.x, posCannon.y + 3, posCannon.z, // Posi��o do Alvo
-              0.0f, 1.0f, 0.0f);                         // comentar esse dps, e deixar o de baixo!!!
-    // gluLookAt(13, 6, 55,
-    //           13, 1, 10,
-    //           0.0f, 1.0f, 0.0f);
+    // gluLookAt(posCannon.x, posCannon.y + 3, posCannon.z + 5,
+    //           posCannon.x, posCannon.y + 3, posCannon.z, // Posi��o do Alvo
+    //           0.0f, 1.0f, 0.0f);                         // comentar esse dps, e deixar o de baixo!!!
+    gluLookAt(13, 6, 55,
+              13, 1, 10,
+              0.0f, 1.0f, 0.0f);
 }
 // **********************************************************************
 //  void reshape( int w, int h )
