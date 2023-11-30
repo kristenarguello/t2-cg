@@ -72,7 +72,7 @@ float forcaTiro = 4;
 bool muro_atingido[25][15];
 vector<int> limitesCanhao;
 
-#define inimigos 20
+#define inimigos 22
 Objeto3D dog;
 struct Dog
 {
@@ -618,12 +618,12 @@ void PosicUser()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    // gluLookAt(posCannon.x, posCannon.y + 3, posCannon.z + 5,
-    //           posCannon.x, posCannon.y + 3, posCannon.z, // Posi��o do Alvo
-    //           0.0f, 1.0f, 0.0f);                         // comentar esse dps, e deixar o de baixo!!!
-    gluLookAt(13, 6, 55,
-              13, 1, 10,
-              0.0f, 1.0f, 0.0f);
+    gluLookAt(posCannon.x, posCannon.y + 3, posCannon.z + 5,
+              posCannon.x, posCannon.y + 3, posCannon.z, // Posi��o do Alvo
+              0.0f, 1.0f, 0.0f);                         // comentar esse dps, e deixar o de baixo!!!
+    // gluLookAt(13, 6, 55,
+    //           13, 1, 10,
+    //           0.0f, 1.0f, 0.0f);
 }
 // **********************************************************************
 //  void reshape( int w, int h )
